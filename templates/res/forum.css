@@ -1,0 +1,81 @@
+
+body, table {
+	font-family: verdana, tahoma, arial, sans-serif;
+	font-size: 10pt;
+}
+
+
+a, a:visited, a:active {
+	color: blue;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+/* tables */
+
+td.t {
+	padding-right: 20px;
+}
+td.tp, td.dt {
+	text-align: center;
+}
+td.dt {
+	font-size: 8pt;
+}
+table {
+        background-color: #CDCDCD;
+        margin:10px 0pt 15px;
+        text-align: left;
+}
+table thead tr th, table tfoot tr th {
+        background-color: #BCD2D2;
+        border: 1px solid #FFF;
+        font-size: 8pt;
+        padding: 4px;
+		padding-right: 30px;
+		text-align: left;
+}
+table thead tr .header {
+        background-image: url(img/bg.gif);
+        background-repeat: no-repeat;
+        background-position: center right;
+        cursor: pointer;
+}
+table tbody td {
+        color: #3D3D3D;
+        padding: 4px 10px;
+        background-color: #FFF;
+        vertical-align: top;
+}
+table tbody tr.odd td {
+        background-color:#F0F0F6;
+}
+table thead tr .headerSortUp {
+        background-image: url(img/asc.gif);
+}
+table thead tr .headerSortDown {
+        background-image: url(img/desc.gif);
+}
+table thead tr .headerSortDown, table thead tr .headerSortUp {
+		background-color: #8dbdd8;
+}
+
+#pager {
+	padding-bottom: 20px;	
+}
+#pager img {
+	cursor: pointer;
+	vertical-align: middle;
+}
+#pager span:hover {
+	background: #eee;
+}
+#pager input {
+	width: 75px;
+	text-align: center;
+	border: 0px;
+}
+
+

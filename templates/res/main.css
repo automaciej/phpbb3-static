@@ -1,0 +1,41 @@
+
+body, table {
+	font-family: verdana, tahoma, arial, sans-serif;
+	font-size: 10pt;
+}
+
+a, a:visited, a:active {
+	color: blue;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+table {
+        background-color: #CDCDCD;
+        margin:10px 0pt 15px;
+        text-align: left;
+}
+table tr th, table tr th {
+	background: #BCD2D2;
+        border: 1px solid #FFF;
+        font-size: 8pt;
+        padding: 4px;
+		text-align: center;
+}
+table td {
+        color: #3D3D3D;
+        padding: 4px 10px;
+        background-color: #FFF;
+        vertical-align: top;
+}
+.tp, .tt {
+	width: 75px;
+}
+td.tp, td.tt {
+	text-align: center;
+}
+.cat {
+        background-color: #e6EEEE;
+}

@@ -1,0 +1,95 @@
+body {
+	margin: 30px;
+	font-family: verdana, tahoma, arial, sans-serif;
+}
+
+.post {
+	background: #f6f6f6;
+	border: 1px solid #aaa;
+	padding: 1px;
+	font-size: 10pt;
+	margin-bottom: 20px;
+}
+
+.post:hover {
+	border-color: #888;
+}
+.post:hover .info {
+	background: #bbb;
+}
+
+.info {
+	background: #ddd;
+	padding: 5px;
+	font-size: 8pt;
+}
+
+.info p {
+	margin: 0px;
+}
+
+.poster {
+	float: left;
+	font-weight: bold;
+}
+.dt {
+	text-align: right;
+}
+
+
+
+.msg {
+	padding: 5px;
+}
+
+blockquote, q {
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin: 10px 20px 0 30px;
+	background: white;
+	margin-bottom: 0px;
+	display: block;
+	quotes: "" "" "" ""
+}
+
+code {
+	display: block;
+	margin-left: 30px;
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin: 10px 20px 0 30px;
+	background: white;
+	color: #080;
+}
+
+.breadcrumb {
+	font-size: 10pt;
+	background: #eee;
+	padding: 5px;
+}
+.breadcrumb p {
+	margin: 0px;
+}
+
+.original {
+	font-size: 10pt;
+}
+
+h1 {
+	margin: 20px 0;
+}
+
+a, a:visited, a:active {
+	color: blue;
+	text-decoration: underline;
+}
+a:hover {
+	text-decoration: none;
+}
+
+q > br:first-child, code > br:first-child {
+	display: none;
+}
+
+
+
