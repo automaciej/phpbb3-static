@@ -11,7 +11,7 @@ global $bb;
 </head><body>
 
 <div class="breadcrumb">
-	<p><a href="../index.html">Beranda</a> &raquo; <a href="index.html"><?=$forum_title;?></a></p>
+	<p><a href="../index.html">Forums Archive Home</a> &raquo; <a href="index.html"><?=$forum_title;?></a></p>
 </div>
 
 <h1><?=$title;?></h1>
