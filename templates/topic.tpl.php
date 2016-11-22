@@ -35,7 +35,7 @@ global $bb;
 		$html = nl2br($bb->qParse($text));
 
 ?>
-<div class="post <?=$oe;?>">
+<div class="post">
 	<div class="info">
 		<p class="poster"><?=$user;?></p>
 		<p class="dt"><?=$dt;?></p>
