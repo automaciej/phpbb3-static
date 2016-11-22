@@ -1,4 +1,4 @@
-<?
+<?php
 
 include('HTML/BBCodeParser.php');
 $bbopt = array(

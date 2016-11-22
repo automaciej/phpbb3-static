@@ -1,4 +1,4 @@
-<?
+<?php
 
 global $bb;
 
@@ -20,7 +20,7 @@ global $bb;
 	<a href="<?=$url;?>"><?=$url;?></a>
 </p></div>
 
-<?
+<?php
 
 	foreach ($posts as $post) {
 
@@ -46,7 +46,7 @@ global $bb;
 	<!-- END MESSAGE -->
 	</div>
 </div>
-<?
+<?php
 
 	}
 

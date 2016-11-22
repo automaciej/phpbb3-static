@@ -12,7 +12,7 @@
 	<th class="tt">Topics</th>
 	<th class="tc">Posts</th>
 </tr>
-<?
+<?php
 
 while (list($cid, $cat) = each($categories)) {
 
@@ -22,7 +22,7 @@ while (list($cid, $cat) = each($categories)) {
 <tr>
 	<th colspan="3" class="cat"><?=$ctitle;?></th>
 </tr>
-<?
+<?php
 
 	foreach ($cat['forums'] as $fid) {
 
@@ -36,7 +36,7 @@ while (list($cid, $cat) = each($categories)) {
 	<td class="tt"><?=$tt;?></td>
 	<td class="tp"><?=$tp;?></td>
 </tr>
-<?
+<?php
 
 	}
 }

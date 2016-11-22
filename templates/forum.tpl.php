@@ -24,7 +24,7 @@
 </tr>
 </thead>
 <tbody>
-<?
+<?php
 
 	foreach ($list as $tid) {
 
@@ -40,7 +40,7 @@
 	<td class="ta"><?=$ta;?></td>
 	<td class="dt"><?=$dt;?></td>
 </tr>
-<?
+<?php
 
 	}
 
