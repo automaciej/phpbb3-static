@@ -1,10 +1,10 @@
 <?php
 
-include('HTML/BBCodeParser.php');
+include('HTML/BBCodeParser2.php');
 $bbopt = array(
 	'filters' => array('Basic', 'Email', 'Extended', 'Images', 'Links', 'Lists')
 );
-$bb = new HTML_BBCodeParser($bbopt);
+$bb = new HTML_BBCodeParser2($bbopt);
 
 function template_print($var, $template) {
 	extract($var);

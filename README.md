@@ -4,7 +4,7 @@
 
 1. php5-cli
 2. php5-mysql
-3. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser)
+3. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser2)
 
 ## Usage
 
