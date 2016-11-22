@@ -30,7 +30,7 @@ function write_content($file, $content) {
 	$target = $target_dir . '/' . $file;
 	$dir = dirname($target);
 
-	if (!is_dir($dir)) {
+	if (!is_dir($dir) && !is_link($dir)) {
 		mkdir($dir, 0755);
 	}
 
