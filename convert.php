@@ -235,7 +235,11 @@ $topics = array();
 $forums_tree = array();
 $forums_top = array();
 
-generate_main();
-generate_forums();
-generate_topics();
-
+try {
+  generate_main();
+  generate_forums();
+  generate_topics();
+} catch(PDOException $ex) {
+  echo "An Error occured! " . $ex->getMessage();
+  throw $ex;
+}
