@@ -98,6 +98,7 @@ function generate_topics() {
 				'post_text'  => $row['post_text'],
 				'post_time'  => $row['post_time'],
 				'bbcode_uid'  => $row['bbcode_uid'],
+				'post_id'  => $row['post_id'],
 			);
 		}
 		

@@ -29,13 +29,14 @@ global $bb;
 		$time = $post['post_time'];
 		$dt = date('d-m-Y H:i:s', $time);
 		$bid = $post['bbcode_uid'];
+		$post_id = $post['post_id'];
 
 		$text = str_replace(':' . $bid, '', $text);
 		$text = preg_replace('/\[(\/?)code:\d*\]/', '[\1code]', $text);
 		$html = nl2br($bb->qParse($text));
 
 ?>
-<div class="post">
+<div class="post" id="p<?=$post_id?>">
 	<div class="info">
 		<p class="poster"><?=$user;?></p>
 		<p class="dt"><?=$dt;?></p>
