@@ -71,11 +71,14 @@ function generate_topics() {
 	global $db_prefix;
 	global $forum_name, $forum_url;
 	global $phpbb_version;
+	global $archive_base_url;
 
 	$res = $db->query(
 		'SELECT config_value FROM ' . $db_prefix .
 		"config WHERE config_name = 'smilies_path';");
 	$smilies_path = $res->fetch()['config_value'];
+
+	$sitemap = array();
 
 	log_info("Topics:");
 
@@ -90,6 +93,7 @@ function generate_topics() {
 		$var['tid'] = $tid;
 		$var['url'] = $forum_url . '/viewtopic.php?t=' . $tid;
 		$var['posts'] = array();
+		$var['lastmod'] = $topics[$tid]['lastmod'];
 
 		if ($phpbb_version == PHPBB2) {
 			$res = $db->query('SELECT p.post_id, p.poster_id, p.post_username, u.username, p.post_time, pt.post_subject, pt.post_text, pt.bbcode_uid FROM '.$db_prefix.'posts p LEFT JOIN '.$db_prefix.'users u ON p.poster_id=u.user_id LEFT JOIN '.$db_prefix.'posts_text pt ON p.post_id=pt.post_id WHERE p.topic_id=' . $tid . ' ORDER BY p.post_time ASC');
@@ -108,23 +112,35 @@ function generate_topics() {
 			);
 		}
 		
-
 		// Generate a redirection page. We might not know the topic slug when
 		// linking. In such case we land in the slug-less page which is a redirect
 		// to the slugged URL, with content.
 		$content = template_get($var, 'topic-redirect.tpl.php');
 		write_content($fid . '/' . $tid . '/index.html', $content);
 
+		$post_rel_url = $fid . '/' . $tid . '/' . $var['slug'] . '/';
+		array_push($sitemap, array(
+			'loc' => $archive_base_url . $post_rel_url,
+			'lastmod' => $var['lastmod'],
+		));
+
 		$content = template_get($var, 'topic.tpl.php');
 		// Fix the smilies paths. Smilies are linked from the topic level, so if we
 		// want to count smilies from the top level, we need to go up 3 levels.
 		$content = str_replace('{SMILIES_PATH}', '../../../' . $smilies_path, $content);
-		write_content($fid . '/' . $tid . '/' . $var['slug'] . '/index.html', $content);
+		write_content($post_rel_url . '/index.html', $content);
 
 		log_info(" $tid");
 	}
 
 	log_info("\n");
+
+	log_info("Sitemap:");
+	$var = array(
+		'urlset' => $sitemap,
+	);
+	$content = template_get($var, 'sitemap.tpl.php');
+	write_content('sitemap.xml', $content);
 }
 
 function generate_forums() {
@@ -134,7 +150,7 @@ function generate_forums() {
 	global $db_prefix;
 	global $forum_name, $forum_description;
 
-	$res = $db->query('SELECT t.forum_id, t.topic_id, t.topic_title, t.topic_time, t.topic_replies, u.username FROM '.$db_prefix.'topics t LEFT JOIN '.$db_prefix.'users u ON t.topic_poster=u.user_id WHERE t.topic_moved_id = 0 ORDER BY t.topic_time DESC');
+	$res = $db->query('SELECT t.forum_id, t.topic_id, t.topic_title, t.topic_time, t.topic_replies, u.username, t.topic_time FROM '.$db_prefix.'topics t LEFT JOIN '.$db_prefix.'users u ON t.topic_poster=u.user_id WHERE t.topic_moved_id = 0 ORDER BY t.topic_time DESC');
 
 	foreach ($res as $row) {
 		$fid = $row['forum_id'];
@@ -148,7 +164,8 @@ function generate_forums() {
 			'title'   => $row['topic_title'],
 			'time'    => $row['topic_time'],
 			'replies' => $row['topic_replies'],
-			'author'  => $row['username']
+			'author'  => $row['username'],
+			'lastmod' => gmdate('Y-m-d\TH:i:s\Z', $row['topic_time']),
 		);
 		$forums[$fid]['topics'][] = $row['topic_id'];
 	}

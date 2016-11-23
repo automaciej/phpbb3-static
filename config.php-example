@@ -23,6 +23,9 @@ $forum_description = 'Static archive of the old MDN forums. See <a href="/discus
 // archive to the live forum.
 $forum_url = 'http://developer.mozilla.org/static/forums';
 
+// The archive root. Used to generate absolute links (e.g. in the sitemap).
+$archive_base_url = 'http://www.example.com/forum-archive/';
+
 define('PHPBB3', 3);
 define('PHPBB2', 2);
 
