@@ -29,20 +29,21 @@
 	foreach ($list as $tid) {
 
 		$title = $topics[$tid]['title'];
+		$slug = slug($title);
 		$tp = $topics[$tid]['replies'] + 1;
 		$ta = $topics[$tid]['author'];
 
 		$dt = date('d-m-Y H:i:s', $topics[$tid]['time']);
 
 ?>
-<tr><td class="t"><a href="t-<?=$tid;?>.html"><?=$title;?></a></td>
+<tr><td class="t"><a href="<?=$tid;?>/<?= $slug ?>/"><?=$title;?></a></td>
 	<td class="tp"><?=$tp;?></td>
 	<td class="ta"><?=$ta;?></td>
 	<td class="dt"><?=$dt;?></td>
 </tr>
 <?php
 
-	}
+	}  // foreach ($list as $tid)
 
 ?>
 </tbody>

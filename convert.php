@@ -81,6 +81,7 @@ function generate_topics() {
 		$var['forum_name'] = $forum_name;
 		$var['forum_title'] = $forums[$fid]['title'];
 		$var['title'] = $topics[$tid]['title'];
+		$var['slug'] = slug($topics[$tid]['title']);
 		$var['tid'] = $tid;
 		$var['url'] = $forum_url . '/viewtopic.php?t=' . $tid;
 		$var['posts'] = array();
@@ -103,8 +104,14 @@ function generate_topics() {
 		}
 		
 
+		// Generate a redirection page. We might not know the topic slug when
+		// linking. In such case we land in the slug-less page which is a redirect
+		// to the slugged URL, with content.
+		$content = template_get($var, 'topic-redirect.tpl.php');
+		write_content($fid . '/' . $tid . '/index.html', $content);
+
 		$content = template_get($var, 'topic.tpl.php');
-		write_content($fid . '/t-' . $tid . '.html', $content);
+		write_content($fid . '/' . $tid . '/' . $var['slug'] . '/index.html', $content);
 
 		log_info(" $tid");
 	}

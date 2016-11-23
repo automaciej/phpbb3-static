@@ -2,9 +2,10 @@
 
 ## Requirements
 
-1. php5-cli
-2. php5-mysql
-3. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser2)
+1. php7.0-cli
+2. php7.0-mysql
+3. php7.0-intl
+4. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser2)
 
 ## Usage
 

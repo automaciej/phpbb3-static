@@ -7,11 +7,11 @@ global $bb;
 "http://www.w3.org/TR/html4/loose.dtd">
 <html><head>
 <title><?=$title;?> - <?=$forum_name;?></title>
-<link rel="stylesheet" type="text/css" href="../topic.css"/>
+<link rel="stylesheet" type="text/css" href="../../../topic.css"/>
 </head><body>
 
 <div class="breadcrumb">
-	<p><a href="../">Forums Archive Home</a> &raquo; <a href="index.html"><?=$forum_title;?></a></p>
+	<p><a href="../../../">Forums Archive Home</a> &raquo; <a href="../../"><?=$forum_title;?></a></p>
 </div>
 
 <h1><?=$title;?></h1>
