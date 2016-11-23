@@ -72,6 +72,11 @@ function generate_topics() {
 	global $forum_name, $forum_url;
 	global $phpbb_version;
 
+	$res = $db->query(
+		'SELECT config_value FROM ' . $db_prefix .
+		"config WHERE config_name = 'smilies_path';");
+	$smilies_path = $res->fetch()['config_value'];
+
 	log_info("Topics:");
 
 	while (list($tid, $topic) = each($topics)) {
@@ -111,6 +116,9 @@ function generate_topics() {
 		write_content($fid . '/' . $tid . '/index.html', $content);
 
 		$content = template_get($var, 'topic.tpl.php');
+		// Fix the smilies paths. Smilies are linked from the topic level, so if we
+		// want to count smilies from the top level, we need to go up 3 levels.
+		$content = str_replace('{SMILIES_PATH}', '../../../' . $smilies_path, $content);
 		write_content($fid . '/' . $tid . '/' . $var['slug'] . '/index.html', $content);
 
 		log_info(" $tid");
