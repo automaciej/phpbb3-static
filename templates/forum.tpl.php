@@ -2,6 +2,8 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html><head><title><?=$forum_title;?> - <?=$forum_name;?></title>
 <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <script type="text/javascript" src="../jquery.js"></script>
 <script type="text/javascript" src="../jquery.tablesorter.js"></script>
 <script type="text/javascript" src="../jquery.tablesorter.pager.js"></script>
