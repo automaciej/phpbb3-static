@@ -20,7 +20,7 @@
 
 4. Copy resources (css, js, etc)
 
-        $ cp templates/res/* static/
+        $ cp -r templates/res/* static/
 
 5. Point your browser to static/ directory
 
