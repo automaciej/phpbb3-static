@@ -9,7 +9,7 @@
 </head><body onload="load('forum')">
 
 <div id="header">
-<p class="h"><a href="../index.html"><?=$forum_name;?></a></p>
+<p class="h"><a href="../"><?=$forum_name;?></a></p>
 <p class="d"><?=$forum_description;?></p>
 </div>
 

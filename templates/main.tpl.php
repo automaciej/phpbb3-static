@@ -32,7 +32,7 @@ while (list($cid, $cat) = each($categories)) {
 
 ?>
 <tr>
-	<td class="t"><a href="<?=$fid;?>/index.html"><?=$title;?></a></td>
+	<td class="t"><a href="<?=$fid;?>/"><?=$title;?></a></td>
 	<td class="tt"><?=$tt;?></td>
 	<td class="tp"><?=$tp;?></td>
 </tr>
