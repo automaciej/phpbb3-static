@@ -1,11 +1,15 @@
 <?php
 
+// This works with a MySQL database. If your forum uses a different database,
+// you need to modify convert.php to connect to your DB.
 $db_host = 'localhost';
 $db_user = 'phpbb';
 $db_pass = 'phpbb';
 $db_name = 'phpbb';
-$db_prefix = 'phpbb_';
+$db_prefix = 'phpbb3_';
 
+// Do not archive these forums and/or topics. The typical use case is if you
+// have a private/hidden forum.
 $filter_forum = array();
 $filter_topic = array();
 
@@ -14,6 +18,9 @@ $target_dir = 'static/';
 
 $forum_name = 'MDN Forums';
 $forum_description = 'Static archive of the old MDN forums. See <a href="/discussion" target="_top">the discussion page</a> for current resources';
+
+// The URL of the live forum. This is used to create links from topics in the
+// archive to the live forum.
 $forum_url = 'http://developer.mozilla.org/static/forums';
 
 define('PHPBB3', 3);
@@ -21,4 +28,4 @@ define('PHPBB2', 2);
 
 $phpbb_version = PHPBB3;
 
-
+?>
