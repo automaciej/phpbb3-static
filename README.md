@@ -6,6 +6,7 @@
 2. php7.0-mysql
 3. php7.0-intl
 4. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser2)
+5. Python + requests + Beautiful Soup 4
 
 ## Usage
 
@@ -29,9 +30,6 @@
 6. That's all :)
 
 ## Bugs / known issues
-
-The bbcode parsing is limited, and doesn't handle URLs correctly, so links in
-your archive will likely be broken, see issue #2.
 
 There are usability issue: if you go from the list of topics to a topic and then
 go back, you'll lose your position in the list of forums, see issue #3.

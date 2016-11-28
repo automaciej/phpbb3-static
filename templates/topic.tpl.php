@@ -28,16 +28,11 @@ global $bb;
 	foreach ($posts as $post) {
 
 		$user = $post['username'];
-		$text = $post['post_text'];
+		$html = $post['post_text'];
 		$time = $post['post_time'];
 		$dt = date('d-m-Y H:i:s', $time);
 		$bid = $post['bbcode_uid'];
 		$post_id = $post['post_id'];
-
-		$text = str_replace(':' . $bid, '', $text);
-		$text = preg_replace('/\[(\/?)code:\d*\]/', '[\1code]', $text);
-		$html = nl2br($bb->qParse($text));
-
 ?>
 <div class="post" id="p<?=$post_id?>">
 	<div class="info">

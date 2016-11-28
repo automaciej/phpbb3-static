@@ -72,6 +72,7 @@ function generate_topics() {
 	global $forum_name, $forum_url;
 	global $phpbb_version;
 	global $archive_base_url;
+	global $bb;
 
 	$res = $db->query(
 		'SELECT config_value FROM ' . $db_prefix .
@@ -103,9 +104,28 @@ function generate_topics() {
 		}
 
 		foreach ($res as $row) {
+			// Get the post from the live forum. This is a hacky approach. Ideally
+			// we'd remove the dependency on Python and do it in pure PHP.
+			system('./get_post.py ' . $forum_url . ' ' . $row['post_id'] . ' output.html');
+			$fd = fopen('output.html', 'r') or die('Unable to open file output.html');
+			$post_length = filesize('output.html');
+			unlink('output.html');
+			if ($post_length > 0) {
+				$post_text = stream_get_contents($fd, $post_length);
+			} else {
+				// We got a zero-length file. Let's try to parse the database
+				// representation that we've retrieved from the database. If there are
+				// links in it, they will be broken, but it's better than nothing.
+				$post_text = $row['post_text'];
+				$post_text = str_replace(':' . $row['bbcode_uid'], '', $post_text);
+				$post_text = preg_replace('/\[(\/?)code:\d*\]/', '[\1code]', $post_text);
+				$post_text = nl2br($bb->qParse($post_text));
+			}
+			fclose($fd);
 			$var['posts'][] = array(
 				'username'   => $row['username'],
-				'post_text'  => $row['post_text'],
+				// 'post_text'  => $row['post_text'],
+				'post_text'  => $post_text,
 				'post_time'  => $row['post_time'],
 				'bbcode_uid'  => $row['bbcode_uid'],
 				'post_id'  => $row['post_id'],
@@ -125,9 +145,12 @@ function generate_topics() {
 		));
 
 		$content = template_get($var, 'topic.tpl.php');
-		// Fix the smilies paths. Smilies are linked from the topic level, so if we
-		// want to count smilies from the top level, we need to go up 3 levels.
-		$content = str_replace('{SMILIES_PATH}', '../../../' . $smilies_path, $content);
+
+		// Fix the smilies paths. In an phpBB installation, links to smilies start
+		// from the top level. In the case of the archive, topics are 3 levels down,
+		// when you cound slashes. So if images are in the same place as previously,
+		// we need to go 3 levels up to find them.
+		$content = str_replace('src="./' . $smilies_path, 'src="../../../' . $smilies_path, $content);
 		write_content($post_rel_url . '/index.html', $content);
 
 		log_info(" $tid");

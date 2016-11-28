@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/), and
 releases follow the [semantic versioning guidelines](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+-   Fetching post content from a live forum instead of own bbcode parsing.
 
 ## [0.2.0] ― 2016-11-30
 ### Added
