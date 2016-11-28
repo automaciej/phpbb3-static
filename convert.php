@@ -135,12 +135,13 @@ function generate_topics() {
 
 	log_info("\n");
 
-	log_info("Sitemap:");
+	log_info("Sitemap: ");
 	$var = array(
 		'urlset' => $sitemap,
 	);
 	$content = template_get($var, 'sitemap.tpl.php');
 	write_content('sitemap.xml', $content);
+	log_info("done.\n");
 }
 
 function generate_forums() {
