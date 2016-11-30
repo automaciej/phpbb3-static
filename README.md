@@ -3,33 +3,50 @@
 ## Requirements
 
 1. php7.0-cli
-2. php7.0-mysql
-3. php7.0-intl
-4. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML_BBCodeParser2)
-5. Python + requests + Beautiful Soup 4
+1. php7.0-intl
+1. php7.0-mysql (the converter only works with MySQL databases)
+1. php7.0-dba
+1. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML\_BBCodeParser2)
+1. A running instance of your forum (read-only is fine)
 
 ## Usage
+
+1. In your forum, go to the control panel, server load section, and set the
+   server load limit to zero, and session limit to zero.
+
+   Otherwise the script won't manage to fetch all posts via HTTP, because it
+   will be blocked by the forum. If this happens, the script will stop with an
+   error.
+
+1. Make sure your forum uses the prosilver skin.
 
 1. Copy config.php-example to config.php and edit it. Set your database
    configuration.
 
-2. Create static/ directory
+1. Create the static/ directory
 
         $ mkdir static
 
-3. Run convert.php script
+1. Run the scripts
 
-        $ php convert.php
+        $ php extract.php
 
-4. Copy resources (css, js, etc)
+   You now have the forum-data.json file in the working directory.
+
+        $ php legacy_generate_html.php
+
+1. Copy resources (css, js, etc)
 
         $ cp -r templates/res/* static/
 
-5. Point your browser to static/ directory
+1. Point your browser to static/ directory
 
-6. That's all :)
+1. Final touches: you might need to copy your forum's smilies directory
+   (images/smilies) into the static directory.
+
+1. That's all :)
 
 ## Bugs / known issues
 
-There are usability issue: if you go from the list of topics to a topic and then
+There are usability issues: if you go from the list of topics to a topic and then
 go back, you'll lose your position in the list of forums, see issue #3.

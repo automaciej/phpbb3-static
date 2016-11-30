@@ -6,6 +6,7 @@ releases follow the [semantic versioning guidelines](http://semver.org/).
 ## [Unreleased]
 ### Changed
 -   Fetching post content from a live forum instead of own bbcode parsing.
+-   Fetching data and writing HTML has been split into 2 steps.
 
 ## [0.2.0] ― 2016-11-30
 ### Added
