@@ -223,7 +223,6 @@ function generate_main() {
 	}
 
 	foreach ($res as $row) {
-		$cid = $row['cat_id'];
 		$categories[$row['cat_id']] = array(
 			'title'  => $row['cat_title'],
 			'forums' => array()
@@ -251,7 +250,6 @@ function generate_main() {
 		$cat_id = $forums_tree[$fid]['cat_id'];
 
 		$forums[$fid] = array(
-			'cid'     => $cid,
 			'title'   => $row['forum_name'],
 			'nposts'  => $row['forum_posts'],
 			'ntopics' => $row['forum_topics'],
