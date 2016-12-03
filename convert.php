@@ -32,8 +32,6 @@ function get_forums_tree() {
 			);
 		}
 
-		$cat_ids = array();
-
 		while (list($fid, $forum) = each($forums_tree)) {
 			$parent_id = $forum['parent_id'];
 
@@ -46,9 +44,6 @@ function get_forums_tree() {
 
 				$forums_tree[$fid]['cat_id'] = $cat_id;
 
-			}
-			else {
-				$cat_ids[] = $fid;
 			}
 
 		}
