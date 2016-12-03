@@ -170,7 +170,7 @@ function generate_topics() {
 function generate_forums() {
 	global $db;
 	global $forums, $topics;
-	global $filter_forum, $filter_topic;
+	global $filter_forum;
 	global $db_prefix;
 	global $forum_name, $forum_description;
 
@@ -216,7 +216,7 @@ function generate_forums() {
 function generate_main() {
 	global $db;
 	global $categories, $forums, $forums_tree;
-	global $filter_forum, $filter_topic;
+	global $filter_forum;
 	global $db_prefix;
 	global $forum_name, $forum_description;
 	global $phpbb_version;

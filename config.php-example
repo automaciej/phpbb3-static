@@ -8,10 +8,10 @@ $db_pass = 'phpbb';
 $db_name = 'phpbb';
 $db_prefix = 'phpbb3_';
 
-// Do not archive these forums and/or topics. The typical use case is if you
-// have a private/hidden forum.
+// Do not archive these forums. The typical use case is if you have a
+// private/hidden forum. This script doesn't understand or process phpBB
+// permissions system, you have to do it manually here.
 $filter_forum = array();
-$filter_topic = array();
 
 $template_dir = 'templates/';
 $target_dir = 'static/';
