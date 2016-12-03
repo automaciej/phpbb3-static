@@ -7,7 +7,7 @@ $forum_url = trim($forum_url, '/');
 
 function get_forums_tree() {
 	global $db;
-	global $categories, $forums_tree, $forums_top;
+	global $categories, $forums_tree;
 	global $phpbb_version;
 	global $db_prefix;
 
@@ -20,8 +20,6 @@ function get_forums_tree() {
 				'cat_id'    => $row['cat_id'],
 				'children'  => array()
 			);
-
-			$forums_top[] = $row['forum_id'];
 		}
 	}
 	else if ($phpbb_version == PHPBB3) {
@@ -53,12 +51,6 @@ function get_forums_tree() {
 				$cat_ids[] = $fid;
 			}
 
-		}
-
-		foreach ($cat_ids as $cat_id) {
-			foreach ($forums_tree[$cat_id]['children'] as $fid) {
-				$forums_top[] = $fid;
-			}
 		}
 
 	}
@@ -290,7 +282,6 @@ $categories = array();
 $forums = array();
 $topics = array();
 $forums_tree = array();
-$forums_top = array();
 
 try {
   generate_main();
