@@ -53,5 +53,7 @@ global $topics_append_html;
 <footer>
 <?=$topics_append_html?>
 </footer>
+<?php
+include('google_analytics.php');
+?>
 </body></html>
-

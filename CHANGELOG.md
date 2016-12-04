@@ -6,7 +6,8 @@ releases follow the [semantic versioning guidelines](http://semver.org/).
 ## [Unreleased]
 ### Added
 -   viewtopic.php and viewforum.php shims to preserve old URLs and add redirects
--   An extra variable to append HTML to the end of each page.
+-   An extra variable to append HTML to the end of each topic page.
+-   Support for Google Analytics
 
 ### Changed
 -   Fetching post content from a live forum instead of own bbcode parsing.

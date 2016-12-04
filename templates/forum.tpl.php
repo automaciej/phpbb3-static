@@ -68,6 +68,8 @@
 		</select>
 	</form>
 </div>
-
+<?php
+include('google_analytics.php');
+?>
 </body></html>
 

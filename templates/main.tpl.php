@@ -46,4 +46,7 @@ while (list($cid, $cat) = each($categories)) {
 
 ?>
 </table>
+<?php
+include('google_analytics.php');
+?>
 </body></html>

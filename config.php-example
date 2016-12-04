@@ -23,6 +23,8 @@ $topics_append_html = <<<HTML
 of each topic page. -->
 HTML
 ;
+// If set, will add tracking code to each page.
+// $google_analytics = 'UA-XXXXXX-Y';
 
 // The URL of the live forum. This is used to create links from topics in the
 // archive to the live forum.
