@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/), and
 releases follow the [semantic versioning guidelines](http://semver.org/).
 
 ## [Unreleased]
+### Added
+-   viewtopic.php and viewforum.php shims to preserve old URLs and add redirects
+
 ### Changed
 -   Fetching post content from a live forum instead of own bbcode parsing.
 -   Fetching data and writing HTML has been split into 2 steps.

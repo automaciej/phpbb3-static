@@ -46,6 +46,20 @@
 
 1. That's all :)
 
+### Redirects from old URLs
+
+If you would like to preserve the old URLs and redirect to the archive, you can
+generate a file with redirection data:
+
+```
+php generate_redirection_data.php
+```
+
+This command will generate redirection-data.php.
+
+Then customize the included viewforum.php and viewtopic.php files, copy
+redirection-data.php there too, it's necessary for redirections to work.
+
 ## Bugs / known issues
 
 There are usability issues: if you go from the list of topics to a topic and then
