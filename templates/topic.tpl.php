@@ -19,9 +19,9 @@ global $bb;
 
 <h1><?=$title;?></h1>
 
-<div class="original"><p>Live forum: 
+<!-- Live forum:
 	<a href="<?=$url;?>"><?=$url;?></a>
-</p></div>
+-->
 
 <?php
 
