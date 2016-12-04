@@ -16,8 +16,13 @@ $filter_forum = array();
 $template_dir = 'templates/';
 $target_dir = 'static/';
 
-$forum_name = 'MDN Forums';
+$forum_name = 'MDN Forums Archive';
 $forum_description = 'Static archive of the old MDN forums. See <a href="/discussion" target="_top">the discussion page</a> for current resources';
+$topics_append_html = <<<HTML
+<!-- This will be appended to each topic. You can use it to add links at the end
+of each topic page. -->
+HTML
+;
 
 // The URL of the live forum. This is used to create links from topics in the
 // archive to the live forum.

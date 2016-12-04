@@ -1,6 +1,6 @@
 <?php
 
-global $bb;
+global $topics_append_html;
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -50,5 +50,8 @@ global $bb;
 	}
 
 ?>
+<footer>
+<?=$topics_append_html?>
+</footer>
 </body></html>
 
