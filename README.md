@@ -33,7 +33,7 @@
 
    You now have the forum-data.json file in the working directory.
 
-        $ php legacy_generate_html.php
+        $ php legacy_write_html.php
 
 1. Copy resources (css, js, etc)
 
