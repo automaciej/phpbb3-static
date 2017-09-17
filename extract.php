@@ -133,7 +133,6 @@ SQL
           //   var_dump($caller->errors());
           // }
           $xpath = new DOMXpath($doc);
-
           foreach($xpath->query("//div[contains(@class, 'post') and contains(@id, 'p')]") as $div) {
             $id = $div->getAttribute('id');
             $textNodes = $xpath->query("//div[@id='{$id}']//div[@class='content']");
@@ -230,8 +229,8 @@ function get_forums_and_topics($phpbb_version, $db, $db_prefix, $extracted) {
   }
   else if ($phpbb_version == PHPBB3) {
     //FIXME: fix ordering
-    $res = $db->query("SELECT forum_id, forum_name, forum_posts, forum_topics FROM {$db_prefix}forums WHERE parent_id<>0 ORDER BY left_id;");
-  }
+    $res = $db->query("SELECT forum_id, forum_name, forum_posts_approved, forum_topics_approved FROM {$db_prefix}forums WHERE parent_id<>0 ORDER BY left_id;");
+}
 
   $categories = $extracted['categories'];
   foreach ($res as $row) {
@@ -246,8 +245,8 @@ function get_forums_and_topics($phpbb_version, $db, $db_prefix, $extracted) {
 
     $forums[$fid] = array(
       'title'   => $row['forum_name'],
-      'nposts'  => $row['forum_posts'],
-      'ntopics' => $row['forum_topics'],
+      'nposts'  => $row['forum_posts_approved'],
+      'ntopics' => $row['forum_topics_approved'],
       'topics'  => array()
     );
 
@@ -261,7 +260,7 @@ SELECT
   t.topic_id,
   t.topic_title,
   t.topic_time,
-  t.topic_replies,
+  t.topic_posts_approved,
   u.username
 FROM
   {$db_prefix}topics t
@@ -285,7 +284,7 @@ SQL
       'fid'     => $fid,
       'title'   => $row['topic_title'],
       'time'    => $row['topic_time'],
-      'replies' => $row['topic_replies'],
+      'replies' => $row['topic_posts_approved'],
       'author'  => $row['username'],
       'lastmod' => gmdate('Y-m-d\TH:i:s\Z', $row['topic_time']),
     );

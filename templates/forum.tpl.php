@@ -33,7 +33,7 @@
 
 		$title = $topics[$tid]['title'];
 		$slug = slug($title);
-		$tp = $topics[$tid]['replies'] + 1;
+		$tp = $topics[$tid]['replies'];
 		$ta = $topics[$tid]['author'];
 
 		$dt = date('d-m-Y H:i:s', $topics[$tid]['time']);
