@@ -37,5 +37,6 @@ define('PHPBB3', 3);
 define('PHPBB2', 2);
 
 $phpbb_version = PHPBB3;
+$phpbb3_minor_version = 0; // 0, 1 or 2
 
 ?>
