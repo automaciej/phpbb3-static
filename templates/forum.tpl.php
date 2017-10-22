@@ -33,7 +33,13 @@
 
 		$title = $topics[$tid]['title'];
 		$slug = slug($title);
-		$tp = $topics[$tid]['replies'] + 1;
+		if($phpbb3_minor_version == 0) {
+			$tp = $topics[$tid]['replies'] + 1;
+		} elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
+			$tp = $topics[$tid]['replies'];
+		} else {
+			die('Unknown PHPBB minor version');
+		}
 		$ta = $topics[$tid]['author'];
 
 		$dt = date('d-m-Y H:i:s', $topics[$tid]['time']);
