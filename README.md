@@ -62,5 +62,22 @@ redirection-data.php there too, it's necessary for redirections to work.
 
 ## Bugs / known issues
 
-There are usability issues: if you go from the list of topics to a topic and then
-go back, you'll lose your position in the list of forums, see issue #3.
+*   Usability issues: if you go from the list of topics to a topic and then go
+    back, you'll lose your position in the list of forums, see issue
+    [#8](https://github.com/automatthias/phpbb3-static/issues/8).
+*   The code doesn't work with PHP5. It shouldn't be a difficult fix, but… see
+    section below.
+
+## Maintenance of phpbb3-static
+
+I used phpbb3-static in 2016, when I was making an archive of my old phpBB
+forum. I've finished this work, and I won't work on phpbb3-static any more.
+
+phpbb3-static is bound to be maintained that way: somebody needs to archive
+a forum, they use the tool, make some changes and fixed, then they move on.
+I will allow phpbb3-static to sit in my repositories on Github, but I won't
+develop the project any more.
+
+If there's a new feature you want, you'll have to implement it yourself, or pay
+someone else to do it. If you have any code changes to contribute, please send
+me a pull request.
