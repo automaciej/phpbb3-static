@@ -289,7 +289,7 @@ if($phpbb3_minor_version == 0) {
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
-    SQL
+SQL
     );
 } elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
     $res = $db->query(<<<SQL
@@ -309,7 +309,7 @@ if($phpbb3_minor_version == 0) {
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
-    SQL
+SQL
     );
 } else {
     die('Unknown PHPBB minor version');
