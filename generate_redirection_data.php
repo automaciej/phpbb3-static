@@ -8,7 +8,7 @@ require_once('common.php');
 
 function array_dump($a) {
   $output = 'array(';
-  while (list($key, $value) = each($a)) {
+  foreach ($a as $key => $value) {
     $output .= "'" . $key . "' => array('" . $value[0] . "', '" . $value[1] . "'),\n";
   }
   $output .= ")\n";
@@ -22,7 +22,7 @@ log_info("done.\n");
 $by_post_id = array();
 $by_topic_id = array();
 // Forum and topic by post ID
-while (list($tid, $topic) = each($extracted['topics'])) {
+foreach ($extracted['topics'] as $tid => $topic) {
   $fid = $topic['fid'];
   foreach ($topic['posts'] as $post) {
     $by_post_id[(string)$post['post_id']] = array($fid, (string)$tid);
