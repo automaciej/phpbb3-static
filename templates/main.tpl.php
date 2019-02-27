@@ -17,7 +17,7 @@
 </tr>
 <?php
 
-while (list($cid, $cat) = each($categories)) {
+foreach ($categories as $cid => $cat) {
 
 	$ctitle = $cat['title'];
 
