@@ -66,11 +66,11 @@
 		<img src="../img/24-arrow-next.png" class="next"/>
 		<img src="../img/24-arrow-last.png" class="last"/>
 		<select class="pagesize">
-			<option selected="selected" value="10">10</option>
-			<option value="25">25</option>
-			<option value="50">50</option>
-			<option value="75">75</option>
 			<option value="100">100</option>
+			<option value="1000">1000</option>
+			<option value="10000">10000</option>
+			<option selected="selected" value="20000">20000</option>
+			<option value="100000">100000</option>
 		</select>
 	</form>
 </div>

@@ -7,7 +7,9 @@
 // and which topic numbers correspond to which forums.
 require_once('redirection-data.php');
 
-$archive_base_url = '<please set>/';
+//$archive_base_url = '<please set>/';
+//if this is in the static folder, use this:
+$archive_base_url = '';
 
 $found = false;
 

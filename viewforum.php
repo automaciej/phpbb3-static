@@ -2,7 +2,9 @@
 
 // This is a minimal shim which redirects from where the forum was, to the
 // archive.
-$archive_base_url = '<please set>/';
+//$archive_base_url = '<please set>/';
+//if the forum dir is the same as the archive:
+$archive_base_url = '';
 
 $found = false;
 

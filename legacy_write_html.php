@@ -19,9 +19,17 @@ function generate_topics($extracted) {
     $fid = $topics[$tid]['fid'];
     $var = array();
     $var['forum_name'] = $forum_name;
-    $var['forum_title'] = $forums[$fid]['title'];
-    $var['title'] = $topics[$tid]['title'];
-    $var['slug'] = slug($topics[$tid]['title']);
+    if (!empty($forums[$fid]['title'])) {
+      $var['forum_title'] = $forums[$fid]['title'];
+    } else {
+      $var['forum_title'] = '(unknown forum)';
+    }
+    if (!empty($topics[$tid]['title'])) {
+      $var['title'] = $topics[$tid]['title'];
+    } else {
+      $var['title'] = '(unknown topic)';
+    }
+    $var['slug'] = slug($var['title']);
     $var['tid'] = $tid;
     $var['url'] = $forum_url . '/viewtopic.php?t=' . $tid;
     $var['posts'] = array();
@@ -64,11 +72,16 @@ function generate_forums($extracted) {
   $topics = $extracted['topics'];
   log_info("Forum index:");
   foreach ($forums as $fid => $forum) {
+    if (!empty($forums[$fid]['title'])) {
+      $forum_title = $forums[$fid]['title'];
+    } else {
+      $forum_title = '(unknown forum)';
+    }
     $var = array(
       'topics'            => $topics,
       'list'              => $forums[$fid]['topics'],
       'forum_name'        => $forum_name,
-      'forum_title'       => $forums[$fid]['title'],
+      'forum_title'       => $forum_title,
       'forum_description' => $forum_description
     );
 

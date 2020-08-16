@@ -24,7 +24,7 @@ function load(f) {
 
 		$('#topics').tablesorterPager({
 			container: $('#pager'),
-			size: 10
+			size: 20000
 		});
 	}
 }

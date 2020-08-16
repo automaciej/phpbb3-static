@@ -19,7 +19,7 @@ global $topics_append_html;
 
 <h1><?=$title;?></h1>
 
-<!-- Live forum:
+<!-- Extracted from:
 	<a href="<?=$url;?>"><?=$url;?></a>
 -->
 
