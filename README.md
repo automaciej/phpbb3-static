@@ -10,6 +10,7 @@
    
    These commands worked for me:
 
+        $ sudo apt-get install php7.3-cli php7.3-intl php7.3-mysql php7.3-dba
         $ sudo pear channel-update pear.php.net
         $ sudo pear install HTML_BBCodeParser2-0.1.0
 		$ sudo chmod -R o+rX /usr/share/php/HTML
@@ -44,24 +45,26 @@
 
 1. Run the scripts
 
-        $ php extract.php
+        $ nice php extract.php
 
    You now have the `forum-data.json` file in the working directory.
    
    The script also creates `forum-data_download_cache.dbm` which is a cache
    of the downloaded pages. Re-running `extract.php` will not re-download the
    pages.
+   
+   Note: using `nice` will not overload your CPU when running this on a production system.
 
 1. Extract HTML pages to the `static/` directory and copy scripts and smilies:
 
-        $ php legacy_write_html.php
+        $ nice php legacy_write_html.php
 
 1. [optional] Redirects from old URLs
 
    If you would like to preserve the old URLs and redirect to the archive,
    generate the file with redirection data:
 
-        $ php generate_redirection_data.php
+        $ nice php generate_redirection_data.php
 
    The script will create `redirection-data.php` in the `static/` directory.
    It will also copy `viewforum.php` and `viewtopic.php` there.
