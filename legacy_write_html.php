@@ -5,11 +5,12 @@ require_once('common.php');
 
 $forum_url = trim($forum_url, '/');
 $forum_dir = trim($forum_dir, '/');
+$forum_dir_valid = TRUE;
 
 if (!is_dir($forum_dir)) {
   error_log("WARNING: forum directory is not valid: '$forum_dir'");
   error_log("         Smilies and attachments will not be copied.");
-  exit(1);
+  $forum_dir_valid = FALSE;
 }
 
 $total_forums = 0;
@@ -99,15 +100,17 @@ function generate_topics($extracted) {
 
     log_info(" $tid");
 	
-	// saving attachments
-	copy_attachments($topic['posts'], $post_rel_url, $tid);
+	if ($forum_dir_valid) {
+	  // saving attachments
+	  copy_attachments($topic['posts'], $post_rel_url, $tid);
+	}
 	
 	$total_topics++;
   }
 
   log_info("\n");
 
-  log_info("Sitemap: ");
+  log_info("Writing sitemap.xml ...");
   $var = array(
     'urlset' => $sitemap,
   );
@@ -122,7 +125,7 @@ function generate_forums($extracted) {
 
   $forums = $extracted['forums'];
   $topics = $extracted['topics'];
-  log_info("Forums:");
+  log_info("Loading forums...");
   foreach ($forums as $fid => $forum) {
     if (!empty($forums[$fid]['title'])) {
       $forum_title = $forums[$fid]['title'];
@@ -170,7 +173,9 @@ generate_forums($extracted);
 generate_topics($extracted);
 
 log_info("\nStatistics:\n");
-log_info("Forums: $total_forums\n");
-log_info("Topics: $total_topics\n");
-log_info("Attachments: $total_attachments ($total_attachment_errors failed)\n");
+log_info("- forums: $total_forums\n");
+log_info("- topics: $total_topics\n");
+log_info("- attachments: $total_attachments ($total_attachment_errors failed)\n");
+
+log_info("\n");
 

@@ -69,7 +69,7 @@ function get_forums_tree($phpbb_version, $db, $db_prefix) {
   return $forums_tree;
 }
 
-function get_attachment_object_from_db($row, $handled_real_filenames) {
+function get_attachment_object_from_db($row, $handled_attachments) {
 
   $physical_filename = $row['physical_filename'];
   $real_filename = $row['real_filename'];
@@ -87,15 +87,15 @@ function get_attachment_object_from_db($row, $handled_real_filenames) {
   
   // do we have a name clash?
   $added_index = 1;
-  if (in_array($real_filename, $handled_real_filenames)) {
+  if (in_array($real_filename, $handled_attachments['real_filenames'])) {
     $ext = $ext = strrchr($real_filename, '.');
 	$base = basename($real_filename, $ext);
 	$new_real_filename = $real_filename;
-    while (in_array($new_real_filename, $handled_real_filenames)) {
+    while (in_array($new_real_filename, $handled_attachments['real_filenames'])) {
 	  $new_real_filename = $base . "-" . $added_index . $ext;
 	  $added_index++;
 	}
-	//log_info("\nAttachment name clash: $real_filename --> $new_real_filename\n");
+	log_info("\nAttachment name clash: $real_filename --> $new_real_filename\n");
 	$real_filename = $new_real_filename;
   }
 
@@ -110,10 +110,10 @@ function get_attachment_object_from_db($row, $handled_real_filenames) {
 }
 
 // @return attachments array
-function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls, &$handled_real_filenames) {
+function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls, $handled_attachments) {
   $debug = false;
+  // the returned array
   $attachments = array();
-  $handled_ids = array();
 
   foreach($download_urls as $download_url) {
     $dl_index = strpos($post_text, "\"" . $download_url);
@@ -139,8 +139,8 @@ function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls,
         if ($res !== FALSE) {
           $row = $res->fetch(PDO::FETCH_ASSOC);
           if ($row !== FALSE) {
-			if (!in_array($row['attach_id'], $handled_ids)) {
-			  $attachment = get_attachment_object_from_db($row, $handled_real_filenames);
+			if (!in_array($row['attach_id'], $handled_attachments['ids'])) {
+			  $attachment = get_attachment_object_from_db($row, $handled_attachments);
 
               if ($debug) log_info("--physical: " . $attachment['physical_filename'] . "\n");
               if ($debug) log_info("--original: " . $attachment['real_filename'] . "\n\n");
@@ -149,8 +149,8 @@ function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls,
               $attachments[] = $attachment;
               // the new link is just pointing to the real filename in the current directory
               $post_text = substr_replace($post_text, rawurlencode($attachment['real_filename']), $dl_index + 1, $link_len);
-			  $handled_ids[] = $attachment['id'];
-			  $handled_real_filenames[] = $attachment['real_filename'];
+			  $handled_attachments['ids'][] = $attachment['id'];
+			  $handled_attachments['real_filenames'][] = $attachment['real_filename'];
 			}
           }
         }
@@ -165,15 +165,15 @@ function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls,
     "attachments WHERE post_msg_id = '" . $post_id . "';");
   if ($res !== FALSE) {
     foreach ($res as $row) {
-      if (!in_array($row['attach_id'], $handled_ids)) {
-	    $attachment = get_attachment_object_from_db($row, $handled_real_filenames);
+      if (!in_array($row['attach_id'], $handled_attachments['ids'])) {
+	    $attachment = get_attachment_object_from_db($row, $handled_attachments);
 		log_info("\nNOTE: orphaned attachment for topic " . $row['topic_id'] . " / post $post_id:\n");
         log_info("--physical: " . $attachment['physical_filename'] . "\n");
         log_info("--original: " . $attachment['real_filename'] . "\n\n");
-		$handled_ids[] = $attachment['id'];
-		//manually add a link to that attachment?
+	    $handled_attachments['ids'][] = $attachment['id'];
+		//manually add a link in $post_text to that attachment?
         //$attachments[] = $attachment;
-	    //$handled_real_filenames[] = $attachment['real_filename'];
+		//$handled_attachments['real_filenames'][] = $attachment['real_filename'];
 	  }
 	}
   }
@@ -211,7 +211,7 @@ function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
     $download_urls[] = substr($this_dl_url, $index);
   }
   //log_info("\nAttachment paths: " . implode(",", $download_urls) . "\n");
-
+  $handled_attachments = array();
 
   // This variable will be returned later.
   $topics = $extracted['topics'];
@@ -249,7 +249,8 @@ SQL
     }
 
     $topics[$tid]['posts'] = array();
-    $handled_real_filenames = array();
+    $handled_attachments['real_filenames'] = array();
+    $handled_attachments['ids'] = array();
 
     foreach ($res as $row) {
       $post_id = $row['post_id'];
@@ -315,7 +316,7 @@ SQL
                                'src="../../../' . $smilies_path, $post_text);
 
       //extract attachments
-      $attachments = fix_attachments($row['post_id'], /*IN OUT*/$post_text, $db, $db_prefix, $download_urls, $handled_real_filenames);
+      $attachments = fix_attachments($row['post_id'], /*IN OUT*/$post_text, $db, $db_prefix, $download_urls, $handled_attachments);
 
       $topics[$tid]['posts'][] = array(
         'username'   => $row['username'],
@@ -518,8 +519,13 @@ function save_data_in_json($what, $where_to) {
   }
 }
 
+$db_port_statement = '';
+if (!empty($db_port)) {
+  $db_port_statement = ";port=$db_port";
+}
+
 $db = new PDO(
-  'mysql:host=' . $db_host . ';dbname=' . $db_name . ';charset=utf8mb4',
+  'mysql:host=' . $db_host . $db_port_statement . ';dbname=' . $db_name . ';charset=utf8mb4',
   $db_user, $db_pass);
 
 

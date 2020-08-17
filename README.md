@@ -7,6 +7,12 @@
 1. php7.0-mysql (the converter only works with MySQL databases)
 1. php7.0-dba
 1. PEAR's HTML\_BBCodeParser (https://pear.php.net/package/HTML_BBCodeParser2/)
+   
+   These commands worked for me:
+        $sudo pear channel-update pear.php.net
+        $sudo pear install HTML_BBCodeParser2-0.1.0
+		$sudo chmod -R o+rX /usr/share/php/HTML
+
 1. A running instance of your forum (read-only is fine)
 
 ## Usage
@@ -18,7 +24,16 @@
    will be blocked by the forum. If this happens, the script will stop with an
    error.
 
+1. Also in the forum administration, ensure that every forum sits in a top-level
+   category forum. If there are top level forums, create a category forum "Forums"
+   and set the parent of all top level forums to this category.
+
+   The archive script currently only works correctly for forums which are a child
+   of a category forum.
+
 1. Make sure your forum uses the prosilver skin.
+
+1. Clone this repository to an arbitrary location (not to the forum root!).
 
 1. Copy config.php-example to config.php and edit it. Set your database
    configuration.
