@@ -19,7 +19,7 @@ global $topics_append_html;
 
 <h1><?=$title;?></h1>
 
-<!-- Extracted from:
+<!-- Original URL of this topic:
 	<a href="<?=$url;?>"><?=$url;?></a>
 -->
 

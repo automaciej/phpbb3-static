@@ -16,6 +16,9 @@ $filter_forum = array();
 $template_dir = 'templates/';
 $target_dir = 'static/';
 
+// the relative or absolute path to the forums, for copying the attachments and smilies
+$forum_dir = "../htdocs/forums";
+
 $forum_name = 'MDN Forums Archive';
 $forum_description = 'Static archive of the old MDN forums. See <a href="/discussion" target="_top">the discussion page</a> for current resources';
 $topics_append_html = <<<HTML
@@ -28,9 +31,11 @@ HTML
 
 // The URL of the live forum. This is used to create links from topics in the
 // archive to the live forum.
+// Include http / https!
 $forum_url = 'http://developer.mozilla.org/static/forums';
 
 // The archive root. Used to generate absolute links (e.g. in the sitemap).
+// Include http / https!
 $archive_base_url = 'http://www.example.com/forum-archive/';
 
 define('PHPBB3', 3);

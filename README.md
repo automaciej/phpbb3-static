@@ -41,8 +41,12 @@
 
 1. Point your browser to static/ directory
 
-1. Final touches: you might need to copy your forum's smilies directory
-   (images/smilies) into the static directory.
+1. Final touches: copy your forum's smilies directory
+   (images/smilies) into the static directory:
+
+        $ mkdir static/images
+        $ cp -r  ../htdocs/images/smilies static/images/
+   
 
 1. That's all :)
 
@@ -57,8 +61,11 @@ php generate_redirection_data.php
 
 This command will generate redirection-data.php.
 
-Then customize the included viewforum.php and viewtopic.php files, copy
-redirection-data.php there too, it's necessary for redirections to work.
+Then customize the included viewforum.php and viewtopic.php files, and 
+copy all needed files:
+
+        $ cp viewforum.php viewtopic.php redirection-data.php  static/
+
 
 ## Bugs / known issues
 

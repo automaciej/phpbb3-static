@@ -69,6 +69,119 @@ function get_forums_tree($phpbb_version, $db, $db_prefix) {
   return $forums_tree;
 }
 
+function get_attachment_object_from_db($row, $handled_real_filenames) {
+
+  $physical_filename = $row['physical_filename'];
+  $real_filename = $row['real_filename'];
+  if (empty($real_filename)) {
+    // use physical filename
+    $real_filename = $physical_filename;
+  } else {
+    // fix some problems with filenames
+    $real_filename = str_replace("/", "_", $real_filename);
+    $real_filename = str_replace("\"", "_", $real_filename);
+    $real_filename = str_replace("?", "_", $real_filename);
+    $real_filename = str_replace(":", "_", $real_filename);
+    $real_filename = str_replace(";", "_", $real_filename);
+  }
+  
+  // do we have a name clash?
+  $added_index = 1;
+  if (in_array($real_filename, $handled_real_filenames)) {
+    $ext = $ext = strrchr($real_filename, '.');
+	$base = basename($real_filename, $ext);
+	$new_real_filename = $real_filename;
+    while (in_array($new_real_filename, $handled_real_filenames)) {
+	  $new_real_filename = $base . "-" . $added_index . $ext;
+	  $added_index++;
+	}
+	//log_info("\nAttachment name clash: $real_filename --> $new_real_filename\n");
+	$real_filename = $new_real_filename;
+  }
+
+  $attachment = array(
+    'id' => $row['attach_id'],
+    'physical_filename' => $physical_filename,
+    'real_filename' => $real_filename,
+    'filetime' => $row['filetime'],
+  );
+  
+  return $attachment;
+}
+
+// @return attachments array
+function fix_attachments($post_id, &$post_text, $db, $db_prefix, $download_urls, &$handled_real_filenames) {
+  $debug = false;
+  $attachments = array();
+  $handled_ids = array();
+
+  foreach($download_urls as $download_url) {
+    $dl_index = strpos($post_text, "\"" . $download_url);
+    while ($dl_index !== FALSE) {
+      //extract text until end of link
+      $end_quote_index = strpos($post_text, "\"", $dl_index + 1);
+      if ($end_quote_index === FALSE) {
+        // no end quote found, bail out
+        break;
+      }
+      // link length without quotes
+      $link_len = $end_quote_index - $dl_index - 1;
+      $link_text = substr($post_text, $dl_index + 1, $link_len);
+      if ($debug) log_info("\nlink: $link_text\n");
+      $id_index = strpos($link_text, "id=");
+      if ($id_index !== FALSE) {
+        $link_id = intval(substr($link_text, $id_index + 3));
+        if ($debug) log_info("--ID: $link_id\n");
+
+        $res = $db->query(
+          'SELECT attach_id, physical_filename, real_filename, filetime FROM ' . $db_prefix .
+          "attachments WHERE attach_id = '" . $link_id . "';");
+        if ($res !== FALSE) {
+          $row = $res->fetch(PDO::FETCH_ASSOC);
+          if ($row !== FALSE) {
+			if (!in_array($row['attach_id'], $handled_ids)) {
+			  $attachment = get_attachment_object_from_db($row, $handled_real_filenames);
+
+              if ($debug) log_info("--physical: " . $attachment['physical_filename'] . "\n");
+              if ($debug) log_info("--original: " . $attachment['real_filename'] . "\n\n");
+              if (!$debug) log_info("*");
+
+              $attachments[] = $attachment;
+              // the new link is just pointing to the real filename in the current directory
+              $post_text = substr_replace($post_text, rawurlencode($attachment['real_filename']), $dl_index + 1, $link_len);
+			  $handled_ids[] = $attachment['id'];
+			  $handled_real_filenames[] = $attachment['real_filename'];
+			}
+          }
+        }
+      }
+      $dl_index = strpos($post_text, "\"" . $download_url, $dl_index + 1);
+    }
+  }
+  
+  // now get all attachments which are associated with this post, but not found in text
+  $res = $db->query(
+    'SELECT attach_id, topic_id, physical_filename, real_filename, filetime FROM ' . $db_prefix .
+    "attachments WHERE post_msg_id = '" . $post_id . "';");
+  if ($res !== FALSE) {
+    foreach ($res as $row) {
+      if (!in_array($row['attach_id'], $handled_ids)) {
+	    $attachment = get_attachment_object_from_db($row, $handled_real_filenames);
+		log_info("\nNOTE: orphaned attachment for topic " . $row['topic_id'] . " / post $post_id:\n");
+        log_info("--physical: " . $attachment['physical_filename'] . "\n");
+        log_info("--original: " . $attachment['real_filename'] . "\n\n");
+		$handled_ids[] = $attachment['id'];
+		//manually add a link to that attachment?
+        //$attachments[] = $attachment;
+	    //$handled_real_filenames[] = $attachment['real_filename'];
+	  }
+	}
+  }
+  
+  return $attachments;
+}
+
+
 // Returns updated $topics.
 function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
   global $forum_url;
@@ -79,15 +192,37 @@ function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
     "config WHERE config_name = 'smilies_path';");
   $smilies_path = $res->fetch()['config_value'];
 
+  // gather possible download paths used in the forum (also when cross linking)
+  $download_urls = array();
+  $download_urls[] = "./download/file.php?";
+  $this_dl_url = $forum_url. "/download/file.php?";
+  $download_urls[] = $this_dl_url;
+  $index = strpos($this_dl_url, "https://");
+  if ($index !== FALSE) {
+    // also test for http version
+    $this_dl_url = str_replace("https://", "http://", $this_dl_url);
+    $download_urls[] = $this_dl_url;
+  }
+  // remove protocol
+  $this_dl_url = str_replace("http://", "", $this_dl_url);
+  // next slash is the absolute URL path
+  $index = strpos($this_dl_url, "/");
+  if ($index !== FALSE) {
+    $download_urls[] = substr($this_dl_url, $index);
+  }
+  //log_info("\nAttachment paths: " . implode(",", $download_urls) . "\n");
+
+
   // This variable will be returned later.
   $topics = $extracted['topics'];
 
   // Cache of posts
-  $dba_id = dba_open('posts.cache.dbm', 'c');
+  $dba_id = dba_open('forum-data_download_cache.dbm', 'c');
 
   // For each previously identified topic, fetch the corresponding posts.
   log_info("Topics:");
   foreach ($topics as $tid => $topic) {
+    log_info(" $tid");
     if ($phpbb_version == PHPBB2) {
       $res = $db->query('SELECT p.post_id, p.poster_id, p.post_username, u.username, p.post_time, pt.post_subject, pt.post_text, pt.bbcode_uid FROM '.$db_prefix.'posts p LEFT JOIN '.$db_prefix.'users u ON p.poster_id=u.user_id LEFT JOIN '.$db_prefix.'posts_text pt ON p.post_id=pt.post_id WHERE p.topic_id=' . $tid . ' ORDER BY p.post_time ASC');
     }
@@ -114,6 +249,8 @@ SQL
     }
 
     $topics[$tid]['posts'] = array();
+    $handled_real_filenames = array();
+
     foreach ($res as $row) {
       $post_id = $row['post_id'];
       $got_text = false;
@@ -139,6 +276,15 @@ SQL
             // What if it wasn't found?
             $textNode = $textNodes[0];
             $text = $doc->saveHTML($textNode);
+			// attachments?
+            $attachmentNodes = $xpath->query("//div[@id='{$id}']//dl[@class='attachbox']");
+			if (!empty($attachmentNodes)) {
+              foreach ($attachmentNodes as $attachmentNode) {
+			    $text .= "\n" . $doc->saveHTML($attachmentNode);
+				log_info("+");
+			  }
+			}
+			
             $dbm_key = substr($id, 1);
             dba_insert($dbm_key, $text, $dba_id);
           }
@@ -163,10 +309,13 @@ SQL
 
       // Fix the smilies paths. In an phpBB installation, links to smilies start
       // from the top level. In the case of the archive, topics are 3 levels down,
-      // when you cound slashes. So if images are in the same place as previously,
+      // when you count slashes. So if images are in the same place as previously,
       // we need to go 3 levels up to find them.
       $post_text = str_replace('src="./' . $smilies_path,
                                'src="../../../' . $smilies_path, $post_text);
+
+      //extract attachments
+      $attachments = fix_attachments($row['post_id'], /*IN OUT*/$post_text, $db, $db_prefix, $download_urls, $handled_real_filenames);
 
       $topics[$tid]['posts'][] = array(
         'username'   => $row['username'],
@@ -174,9 +323,9 @@ SQL
         'post_time'  => $row['post_time'],
         'bbcode_uid'  => $row['bbcode_uid'],
         'post_id'  => $row['post_id'],
+        'attachments'  => $attachments,
       );
     }
-    log_info(" $tid");
   }  // each $topics
   log_info(" done.\n");
   dba_close($dba_id);
@@ -352,20 +501,20 @@ SQL
 function save_data_in_json($what, $where_to) {
   // The encoding flags aren't crucial, they are just here because they make it
   // easier for me to review the resulting JSON.
-  log_info('Encoding to JSON… ');
+  log_info('Encoding to JSON... ');
   $encoded_data = json_encode($what,
     JSON_PRETTY_PRINT | JSON_HEX_APOS | JSON_HEX_QUOT
     | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
   if ($encoded_data !== false) {
-    log_info('saving to disk… ');
+    log_info('saving to disk... ');
     $fp = fopen($where_to, 'w');
     fwrite($fp, $encoded_data);
      // The encoder doesn't add a newline at the end.
     fwrite($fp, "\n");
     fclose($fp);
-    log_info('done.');
+    log_info("done.\n");
   } else {
-    error_log('Could not encode data to JSON.');
+    error_log('Could not encode data to JSON.\n');
   }
 }
 

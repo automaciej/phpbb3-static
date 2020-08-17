@@ -4,10 +4,56 @@ require_once('config.php');
 require_once('common.php');
 
 $forum_url = trim($forum_url, '/');
+$forum_dir = trim($forum_dir, '/');
+
+if (!is_dir($forum_dir)) {
+  error_log("WARNING: forum directory is not valid: '$forum_dir'");
+  error_log("         Smilies and attachments will not be copied.");
+  exit(1);
+}
+
+$total_forums = 0;
+$total_topics = 0;
+$total_attachments = 0;
+$total_attachment_errors = 0;
+
+function copy_attachments($posts, $topic_dir, $tid) {
+  global $forum_dir;
+  global $target_dir;
+  global $total_attachment_errors;
+  global $total_attachments;
+  
+  // prevent copy warnings
+  $old_error_reporting = error_reporting(E_ERROR);
+  
+  foreach ($posts as $post) {
+	$attachments = $post['attachments'];
+	if (!empty($attachments)) {
+	  foreach ($attachments as $attachment) {
+        $id = $attachment['id'];
+        $physical_filename = $attachment['physical_filename'];
+        $real_filename = $attachment['real_filename'];
+        //$filetime => $attachment['filetime'];
+		$source = $forum_dir . "/files/" . $physical_filename;
+		$dest = $target_dir . '/' . $topic_dir . $real_filename;
+		if (copy($source, $dest) !== FALSE) {
+		  log_info("*");
+		  $total_attachments++;
+		} else {
+		  error_log("\nERROR: cannot copy attachment '$source' to '$dest'");
+		  error_log("       Attachment ID: $id / Topic ID: $tid");
+		  $total_attachment_errors++;
+		}
+	  }
+	}
+  }
+  error_reporting($old_error_reporting);
+}
 
 function generate_topics($extracted) {
   global $forum_name, $forum_url;
   global $archive_base_url;
+  global $total_topics;
 
   $sitemap = array();
   $topics = $extracted['topics'];
@@ -52,6 +98,11 @@ function generate_topics($extracted) {
     write_content($post_rel_url . '/index.html', $content);
 
     log_info(" $tid");
+	
+	// saving attachments
+	copy_attachments($topic['posts'], $post_rel_url, $tid);
+	
+	$total_topics++;
   }
 
   log_info("\n");
@@ -67,10 +118,11 @@ function generate_topics($extracted) {
 
 function generate_forums($extracted) {
   global $forum_name, $forum_description;
+  global $total_forums;
 
   $forums = $extracted['forums'];
   $topics = $extracted['topics'];
-  log_info("Forum index:");
+  log_info("Forums:");
   foreach ($forums as $fid => $forum) {
     if (!empty($forums[$fid]['title'])) {
       $forum_title = $forums[$fid]['title'];
@@ -89,6 +141,7 @@ function generate_forums($extracted) {
     write_content($fid . '/index.html', $content);
 
     log_info(" $fid");
+	$total_forums++;
   }
   log_info("\n");
 
@@ -115,3 +168,9 @@ $extracted = json_decode(file_get_contents("./forum-data.json"), true);
 generate_main($extracted);
 generate_forums($extracted);
 generate_topics($extracted);
+
+log_info("\nStatistics:\n");
+log_info("Forums: $total_forums\n");
+log_info("Topics: $total_topics\n");
+log_info("Attachments: $total_attachments ($total_attachment_errors failed)\n");
+
