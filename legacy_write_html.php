@@ -13,6 +13,15 @@ if (!is_dir($forum_dir)) {
   $forum_dir_valid = FALSE;
 }
 
+if (!file_exists("./forum-data.json")) {
+  error_log("ERROR: forum data not available. Run this command first:");
+  error_log("       php extract");
+  exit(1);
+}
+
+mkdir_p($target_dir, 0755);
+
+
 $total_forums = 0;
 $total_topics = 0;
 $total_attachments = 0;
@@ -55,6 +64,7 @@ function generate_topics($extracted) {
   global $forum_name, $forum_url;
   global $archive_base_url;
   global $total_topics;
+  global $forum_dir_valid;
 
   $sitemap = array();
   $topics = $extracted['topics'];
@@ -153,6 +163,8 @@ function generate_forums($extracted) {
 function generate_main($extracted) {
   global $forum_name, $forum_description;
 
+  log_info("Creating index...");
+
   // Content
   $var = array(
     'categories'        => $extracted['categories'],
@@ -164,18 +176,51 @@ function generate_main($extracted) {
 
   write_content('index.html', $content);
 
-  log_info("Index: index.html\n");
+  log_info("done\n");
 }
+
+function copy_smilies() {
+	global $target_dir;
+	global $forum_dir;
+	global $forum_dir_valid;
+
+	if ($forum_dir_valid) {
+		$source_dir = $forum_dir . "/images/smilies";
+		if (!is_dir($source_dir)) {
+			error_log("ERROR: forum smiley directory does not exist: $source_dir");
+		} else {
+			log_info("Copying smilies...");
+			$dest_dir = $target_dir . "/images";
+			mkdir_p($dest_dir);
+			recurse_copy($source_dir, $dest_dir . "/smilies");
+			log_info("done\n");
+		}
+	}
+}
+
+
+function copy_templates() {
+	global $target_dir;
+
+	log_info("Copying scripts and images...");
+	$source_dir = "./templates/res";
+	$dest_dir = $target_dir;
+	recurse_copy($source_dir, $dest_dir);
+	log_info("done\n");
+}
+
 
 $extracted = json_decode(file_get_contents("./forum-data.json"), true);
 generate_main($extracted);
 generate_forums($extracted);
 generate_topics($extracted);
+copy_templates();
+copy_smilies();
 
 log_info("\nStatistics:\n");
 log_info("- forums: $total_forums\n");
 log_info("- topics: $total_topics\n");
 log_info("- attachments: $total_attachments ($total_attachment_errors failed)\n");
-
+log_info("Successfully created forum archive in: $target_dir\n");
 log_info("\n");
 

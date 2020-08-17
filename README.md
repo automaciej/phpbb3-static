@@ -38,48 +38,32 @@
 1. Copy config.php-example to config.php and edit it. Set your database
    configuration.
 
-1. Create the static/ directory
-
-        $ mkdir static
-
 1. Run the scripts
 
         $ php extract.php
 
    You now have the forum-data.json file in the working directory.
 
+1. Extract HTML pages to the static/ directory and copy scripts and smilies:
+
         $ php legacy_write_html.php
 
-1. Copy resources (css, js, etc)
+1. [optional] Redirects from old URLs
 
-        $ cp -r templates/res/* static/
+   If you would like to preserve the old URLs and redirect to the archive, you can
+   generate a file with redirection data:
+
+        $ php generate_redirection_data.php
+
+   It will copy `viewforum.php` and `viewtopic.php` from the templates directory
+   and create `redirection-data.php` into the static/ directory.
+   
+   If your old forum URL is different from the archive, you will need to copy these
+   three files into the root of your old forum URL.
 
 1. Point your browser to static/ directory
 
-1. Final touches: copy your forum's smilies directory
-   (images/smilies) into the static directory:
-
-        $ mkdir static/images
-        $ cp -r  ../htdocs/images/smilies static/images/
-   
-
 1. That's all :)
-
-### Redirects from old URLs
-
-If you would like to preserve the old URLs and redirect to the archive, you can
-generate a file with redirection data:
-
-```
-php generate_redirection_data.php
-```
-
-This command will generate redirection-data.php.
-
-Then customize the included viewforum.php and viewtopic.php files, and 
-copy all needed files:
-
-        $ cp viewforum.php viewtopic.php redirection-data.php  static/
 
 
 ## Bugs / known issues
@@ -92,6 +76,10 @@ copy all needed files:
 
 ## Maintenance of phpbb3-static
 
+We at bome have extended and used these scripts in August 2020 to archive
+forums running PHPBB 3.3.
+
+From previous maintainer automatthias:
 I used phpbb3-static in 2016, when I was making an archive of my old phpBB
 forum. I've finished this work, and I won't work on phpbb3-static any more.
 
