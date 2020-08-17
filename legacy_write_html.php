@@ -86,11 +86,13 @@ function generate_topics($extracted) {
       $var['forum_title'] = '(unknown forum)';
     }
     if (!empty($topics[$tid]['title'])) {
-      $var['title'] = $topics[$tid]['title'];
+      $topic_title = $topics[$tid]['title'];
     } else {
-      $var['title'] = '(unknown topic)';
+      $topic_title = '(unknown topic)';
     }
-    $var['slug'] = slug($var['title']);
+	
+    $var['slug'] = slug($topic_title);
+	$var['title'] = get_topic_title_with_type($topic_title, $topics[$tid]['type']);
     $var['tid'] = $tid;
     $var['url'] = $forum_url . '/viewtopic.php?t=' . $tid;
     $var['posts'] = array();

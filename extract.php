@@ -457,13 +457,14 @@ function get_forums_and_topics($phpbb_version, $db, $db_prefix, $extracted) {
   }
 
   // Get topics
-if($phpbb3_minor_version == 0) {
+  if($phpbb3_minor_version == 0) {
     $res = $db->query(<<<SQL
     SELECT
       t.forum_id,
       t.topic_id,
       t.topic_title,
       t.topic_time,
+	  t.topic_type,
       t.topic_replies,
       u.username
     FROM
@@ -472,18 +473,20 @@ if($phpbb3_minor_version == 0) {
     WHERE
       t.topic_moved_id = 0
     ORDER BY
+	  t.topic_type DESC,
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
 SQL
     );
-} elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
+  } elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
     $res = $db->query(<<<SQL
     SELECT
       t.forum_id,
       t.topic_id,
       t.topic_title,
       t.topic_time,
+	  t.topic_type,
       t.topic_posts_approved,
       u.username
     FROM
@@ -492,26 +495,29 @@ SQL
     WHERE
       t.topic_moved_id = 0
     ORDER BY
+	  t.topic_type DESC,
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
 SQL
     );
-} else {
+  } else {
     die('Unknown PHPBB minor version');
-}
+  }
+
   foreach ($res as $row) {
     $fid = $row['forum_id'];
 
     if (in_array($fid, $filter_forum)) {
       continue;
     }
-
+	
     if($phpbb3_minor_version == 0) {
         $topics[$row['topic_id']] = array(
           'fid'     => $fid,
           'title'   => $row['topic_title'],
           'time'    => $row['topic_time'],
+          'type'    => $row['topic_type'],
           'replies' => $row['topic_replies'],
           'author'  => $row['username'],
           'lastmod' => gmdate('Y-m-d\TH:i:s\Z', $row['topic_time']),
@@ -520,6 +526,7 @@ SQL
         $topics[$row['topic_id']] = array(
           'fid'     => $fid,
           'title'   => $row['topic_title'],
+          'type'    => $row['topic_type'],
           'time'    => $row['topic_time'],
           'replies' => $row['topic_posts_approved'],
           'author'  => $row['username'],

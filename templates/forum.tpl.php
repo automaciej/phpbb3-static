@@ -33,6 +33,8 @@
 
 		$title = $topics[$tid]['title'];
 		$slug = slug($title);
+		$topic_type = $topics[$tid]['type'];
+		$title = get_topic_title_with_type($title, $topic_type);
 		if($phpbb3_minor_version == 0) {
 			$tp = $topics[$tid]['replies'] + 1;
 		} elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
@@ -42,13 +44,13 @@
 		}
 		$ta = $topics[$tid]['author'];
 
-		$dt = date('d-m-Y H:i:s', $topics[$tid]['time']);
+		$dt = date('Y-m-d H:i:s', $topics[$tid]['time']);
 
 ?>
 <tr><td class="t"><a href="<?=$tid;?>/<?= $slug ?>/"><?=$title;?></a></td>
 	<td class="tp"><?=$tp;?></td>
 	<td class="ta"><?=$ta;?></td>
-	<td class="dt"><?=$dt;?></td>
+	<td class="dt" ttype="<?=$topic_type;?>"><?=$dt;?></td>
 </tr>
 <?php
 

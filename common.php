@@ -64,6 +64,23 @@ function slug($str) {
 		return $str;
 }
 
+function get_topic_title_with_type($topic_title, $topic_type) {
+  global $topic_title_prefix_sticky, $topic_title_prefix_announcement, $topic_title_prefix_global;
+
+	if ($topic_type == 1) {
+		// sticky
+		return $topic_title_prefix_sticky . $topic_title;
+	} else if ($topic_type == 2) {
+		// announcement
+		return $topic_title_prefix_announcement . $topic_title;
+	} else if ($topic_type == 3) {
+		// global
+		return $topic_title_prefix_global . $topic_title;
+	}
+	return $topic_title;
+}
+
+
 // from: https://stackoverflow.com/questions/2050859/copy-entire-contents-of-a-directory-to-another-using-php
 function recurse_copy($src, $dst) { 
     $dir = opendir($src); 

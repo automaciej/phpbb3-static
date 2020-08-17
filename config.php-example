@@ -51,5 +51,8 @@ $phpbb3_minor_version = 0; // 0, 1 or 2
 
 // constants
 $template_dir = 'templates/';
+$topic_title_prefix_sticky = "(!) ";
+$topic_title_prefix_announcement = "(*) ";
+$topic_title_prefix_global = "* ";
 
 ?>
