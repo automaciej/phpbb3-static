@@ -2,9 +2,7 @@
 
 // This is a minimal shim which redirects from where the forum was, to the
 // archive.
-//$archive_base_url = '<please set>/';
-//if the forum dir is the same as the archive:
-$archive_base_url = '';
+require_once('redirection-data.php');
 
 $found = false;
 
@@ -24,11 +22,11 @@ if ($found) {
 <!doctype html>
 <html>
 <head>
-<title>This topic is gone</title>
+<title>This forum is gone</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<h1>This topic does not exist in the archive.</h1>
+<h1>This forum does not exist in the archive.</h1>
 <h2>HTTP 410</h2>
 </body>
 </html>

@@ -3,8 +3,12 @@
 require_once('config.php');
 require_once('common.php');
 
+log_info("Writing HTML files:\n");
+
 $forum_url = trim($forum_url, '/');
 $forum_dir = trim($forum_dir, '/');
+$target_dir = trim($target_dir, '/');
+
 $forum_dir_valid = TRUE;
 
 if (!is_dir($forum_dir)) {
@@ -70,7 +74,7 @@ function generate_topics($extracted) {
   $topics = $extracted['topics'];
   $forums = $extracted['forums'];
 
-  log_info("Topics:");
+  log_info("Writing topics...");
 
   foreach ($topics as $tid => $topic) {
     $fid = $topics[$tid]['fid'];
@@ -210,7 +214,10 @@ function copy_templates() {
 }
 
 
+log_info("Loading forum-data.json...");
 $extracted = json_decode(file_get_contents("./forum-data.json"), true);
+log_info("done.\n");
+
 generate_main($extracted);
 generate_forums($extracted);
 generate_topics($extracted);

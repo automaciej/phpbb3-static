@@ -31,15 +31,16 @@ HTML
 // If set, will add tracking code to each page.
 // $google_analytics = 'UA-XXXXXX-Y';
 
-// The URL of the live forum.
-// The extract.php script pull the topic pages from here.
+// The URL of the (old) live forum. This is used to create links from topics in the
+// archive to the live forum.
+// extract.php pulls the topic pages from here.
 // Include http / https!
-$forum_url = 'https://www.my-web-site.org/forums';
+$forum_url = 'https://www.my-web-site.org/forums/';
 
 // The archive root where you will install the archived forum.
 // This can be the same URL if you want to replace the live forum with the archive forum.
 // Used to generate absolute links (e.g. in the sitemap).
-// Include http / https!
+// Include http / https. Must end with / .
 $archive_base_url = 'http://www.example.com/forum-archive/';
 
 define('PHPBB3', 3);

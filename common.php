@@ -1,10 +1,13 @@
 <?php
 
+// don't show warnings in BBCodeParser2
+$old_error_reporting = error_reporting(E_ERROR);
 include('HTML/BBCodeParser2.php');
 $bbopt = array(
 	'filters' => array('Basic', 'Email', 'Extended', 'Images', 'Links', 'Lists')
 );
 $bb = new HTML_BBCodeParser2($bbopt);
+error_reporting($old_error_reporting);
 
 function template_print($var, $template) {
 	extract($var);
