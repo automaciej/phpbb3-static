@@ -6,7 +6,7 @@
 1. php7.0-intl
 1. php7.0-mysql (the converter only works with MySQL databases)
 1. php7.0-dba
-1. PEAR's HTML\_BBCodeParser (http://pear.php.net/package/HTML\_BBCodeParser2)
+1. PEAR's HTML\_BBCodeParser (https://pear.php.net/package/HTML_BBCodeParser2/)
 1. A running instance of your forum (read-only is fine)
 
 ## Usage
