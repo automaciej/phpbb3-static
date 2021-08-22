@@ -15,7 +15,7 @@ function generate_topics($extracted) {
 
   log_info("Topics:");
 
-  while (list($tid, $topic) = each($topics)) {
+  foreach ($topics as $tid => $topic) {
     $fid = $topics[$tid]['fid'];
     $var = array();
     $var['forum_name'] = $forum_name;
@@ -63,7 +63,7 @@ function generate_forums($extracted) {
   $forums = $extracted['forums'];
   $topics = $extracted['topics'];
   log_info("Forum index:");
-  while (list($fid, $forum) = each($forums)) {
+  foreach ($forums as $fid => $forum) {
     $var = array(
       'topics'            => $topics,
       'list'              => $forums[$fid]['topics'],

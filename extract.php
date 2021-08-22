@@ -49,7 +49,7 @@ function get_forums_tree($phpbb_version, $db, $db_prefix) {
       );
     }
 
-    while (list($fid, $forum) = each($forums_tree)) {
+    foreach ($forums_tree as $fid => $forum) {
       $parent_id = $forum['parent_id'];
 
       if ($parent_id != 0) {
@@ -87,7 +87,7 @@ function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
 
   // For each previously identified topic, fetch the corresponding posts.
   log_info("Topics:");
-  while (list($tid, $topic) = each($topics)) {
+  foreach ($topics as $tid => $topic) {
     if ($phpbb_version == PHPBB2) {
       $res = $db->query('SELECT p.post_id, p.poster_id, p.post_username, u.username, p.post_time, pt.post_subject, pt.post_text, pt.bbcode_uid FROM '.$db_prefix.'posts p LEFT JOIN '.$db_prefix.'users u ON p.poster_id=u.user_id LEFT JOIN '.$db_prefix.'posts_text pt ON p.post_id=pt.post_id WHERE p.topic_id=' . $tid . ' ORDER BY p.post_time ASC');
     }
@@ -219,6 +219,7 @@ class ErrorTrap {
 // List of topics
 function get_forums_and_topics($phpbb_version, $db, $db_prefix, $extracted) {
   global $filter_forum;
+  global $phpbb3_minor_version;
 
   $topics = array();
   $forums = array();

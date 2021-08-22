@@ -27,8 +27,8 @@
 </tr>
 </thead>
 <tbody>
-<?php
-
+<?php	
+	global $phpbb3_minor_version;
 	foreach ($list as $tid) {
 
 		$title = $topics[$tid]['title'];
