@@ -67,6 +67,7 @@ redirection-data.php there too, it's necessary for redirections to work.
     [#8](https://github.com/automatthias/phpbb3-static/issues/8).
 *   The code doesn't work with PHP5. It shouldn't be a difficult fix, but… see
     section below.
+*   I removed the 16-years-old jquery from the templates/res directory.
 
 ## Maintenance of phpbb3-static
 
