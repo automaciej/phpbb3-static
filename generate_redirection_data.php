@@ -6,6 +6,17 @@
 require_once('config.php');
 require_once('common.php');
 
+log_info("Generating redirection data:\n");
+
+$target_dir = trim($target_dir, '/');
+mkdir_p($target_dir, 0755);
+
+if (!file_exists("./forum-data.json")) {
+  error_log("ERROR: forum data not available. Run this command first:");
+  error_log("       php extract");
+  exit(1);
+}
+
 function array_dump($a) {
   $output = 'array(';
   foreach ($a as $key => $value) {
@@ -15,7 +26,7 @@ function array_dump($a) {
   return $output;
 }
 
-log_info("Loading JSON… ");
+log_info("Loading forum-data.json...");
 $extracted = json_decode(file_get_contents("./forum-data.json"), true);
 log_info("done.\n");
 
@@ -31,13 +42,20 @@ foreach ($extracted['topics'] as $tid => $topic) {
 }
 
 $output = "<?php\n";
+$output .= '$archive_base_url = "' . $archive_base_url . '";' . "\n";
 $output .= '$by_post_id = ' . array_dump($by_post_id) . ";\n";
 $output .= '$by_topic_id = ' . array_dump($by_topic_id) . ";\n";
 $output .= "?>\n";
 
-$f = fopen('redirection-data.php', 'w');
+log_info("Writing $target_dir/redirection-data.php...");
+$f = fopen($target_dir . '/redirection-data.php', 'w');
 fputs($f, $output);
 fclose($f);
-log_info("Wrote redirection-data.php\n");
+log_info("done\n");
+
+log_info("Copying viewforum.php and viewtopic.php to $target_dir...");
+copy("./templates/viewforum.php", $target_dir . "/viewforum.php");
+copy("./templates/viewtopic.php", $target_dir . "/viewtopic.php");
+log_info("done\n\n");
 
 ?>

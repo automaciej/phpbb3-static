@@ -33,6 +33,8 @@
 
 		$title = $topics[$tid]['title'];
 		$slug = slug($title);
+		$topic_type = $topics[$tid]['type'];
+		$title = get_topic_title_with_type($title, $topic_type);
 		if($phpbb3_minor_version == 0) {
 			$tp = $topics[$tid]['replies'] + 1;
 		} elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
@@ -42,13 +44,13 @@
 		}
 		$ta = $topics[$tid]['author'];
 
-		$dt = date('d-m-Y H:i:s', $topics[$tid]['time']);
+		$dt = date('Y-m-d H:i:s', $topics[$tid]['time']);
 
 ?>
 <tr><td class="t"><a href="<?=$tid;?>/<?= $slug ?>/"><?=$title;?></a></td>
 	<td class="tp"><?=$tp;?></td>
 	<td class="ta"><?=$ta;?></td>
-	<td class="dt"><?=$dt;?></td>
+	<td class="dt" ttype="<?=$topic_type;?>"><?=$dt;?></td>
 </tr>
 <?php
 
@@ -66,11 +68,11 @@
 		<img src="../img/24-arrow-next.png" class="next"/>
 		<img src="../img/24-arrow-last.png" class="last"/>
 		<select class="pagesize">
-			<option selected="selected" value="10">10</option>
-			<option value="25">25</option>
-			<option value="50">50</option>
-			<option value="75">75</option>
 			<option value="100">100</option>
+			<option value="1000">1000</option>
+			<option value="10000">10000</option>
+			<option selected="selected" value="20000">20000</option>
+			<option value="100000">100000</option>
 		</select>
 	</form>
 </div>

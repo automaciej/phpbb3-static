@@ -3,6 +3,8 @@
 require_once('config.php');
 require_once('common.php');
 
+log_info("Extracting forum topics and posts:\n");
+
 $forum_url = trim($forum_url, '/');
 
 // A category is a group of forums.
@@ -69,6 +71,154 @@ function get_forums_tree($phpbb_version, $db, $db_prefix) {
   return $forums_tree;
 }
 
+// return FALSE if not found, the attachment object otherwise
+function get_attachment_object_by_id($attachment_id, $all_topic_attachments) {
+	$res = FALSE;
+	foreach ($all_topic_attachments as $attachment) {
+		if ($attachment['id'] == $attachment_id) {
+			$res = $attachment;
+			break;
+		}
+	}
+	return $res;
+}
+
+// return TRUE if found
+function has_attachment_real_filename($real_filename, $all_topic_attachments) {
+	$res = FALSE;
+	foreach ($all_topic_attachments as $attachment) {
+		if ($attachment['real_filename'] == $real_filename) {
+			$res = TRUE;
+			break;
+		}
+	}
+	return $res;
+}
+
+function get_attachment_object_from_db($row, &$all_topic_attachments) {
+
+  // if we have already used this attachment, use it
+  $attachment = get_attachment_object_by_id($row['attach_id'], $all_topic_attachments);
+  if ($attachment !== FALSE) {
+	return $attachment;
+  }
+
+  $physical_filename = $row['physical_filename'];
+  $real_filename = $row['real_filename'];
+  
+  if (empty($real_filename)) {
+    // use physical filename
+    $real_filename = $physical_filename;
+  } else {
+    // fix some problems with filenames
+    $real_filename = str_replace("/", "_", $real_filename);
+    $real_filename = str_replace("\"", "_", $real_filename);
+    $real_filename = str_replace("?", "_", $real_filename);
+    $real_filename = str_replace(":", "_", $real_filename);
+    $real_filename = str_replace(";", "_", $real_filename);
+  }
+  
+ 
+  // do we have a name clash?
+  $added_index = 1;
+  if (has_attachment_real_filename($real_filename, $all_topic_attachments)) {
+    $ext = $ext = strrchr($real_filename, '.');
+	$base = basename($real_filename, $ext);
+	$new_real_filename = $real_filename;
+    while (has_attachment_real_filename($new_real_filename, $all_topic_attachments)) {
+	  $new_real_filename = $base . "-" . $added_index . $ext;
+	  $added_index++;
+	}
+	//log_info("\nAttachment name clash: $real_filename --> $new_real_filename\n");
+	$real_filename = $new_real_filename;
+  }
+
+  $attachment = array(
+    'id' => $row['attach_id'],
+    'physical_filename' => $physical_filename,
+    'real_filename' => $real_filename,
+    'filetime' => $row['filetime'],
+  );
+  $all_topic_attachments[] = $attachment;
+  
+  return $attachment;
+}
+
+// @return attachments array for this post
+function fix_attachments($tid, $post_id, &$post_text, $db, $db_prefix, $download_urls, &$all_topic_attachments) {
+  $debug = false;
+  // the returned array
+  $attachments = array();
+
+  foreach($download_urls as $download_url) {
+    $dl_index = strpos($post_text, "\"" . $download_url);
+    while ($dl_index !== FALSE) {
+      if ($debug) log_info("\nTopic $tid: attachments:\n");
+      //extract text until end of link
+      $end_quote_index = strpos($post_text, "\"", $dl_index + 1);
+      if ($end_quote_index === FALSE) {
+        // no end quote found, bail out
+        if ($debug) log_info("--no end quote found.\n");
+        break;
+      }
+      // link length without quotes
+      $link_len = $end_quote_index - $dl_index - 1;
+      $link_text = substr($post_text, $dl_index + 1, $link_len);
+      if ($debug) log_info("--link: $link_text\n");
+      $id_index = strpos($link_text, "id=");
+      if ($id_index !== FALSE) {
+        $link_id = intval(substr($link_text, $id_index + 3));
+        if ($debug) log_info("--attachment ID: $link_id\n");
+
+        $res = $db->query(
+          'SELECT attach_id, physical_filename, real_filename, filetime FROM ' . $db_prefix .
+          "attachments WHERE attach_id = '" . $link_id . "';");
+        if ($res !== FALSE) {
+          $row = $res->fetch(PDO::FETCH_ASSOC);
+          if ($row !== FALSE) {
+			  $attachment = get_attachment_object_from_db($row, $all_topic_attachments);
+
+              if ($debug) log_info("--physical file: " . $attachment['physical_filename'] . "\n");
+              if ($debug) log_info("--original file: " . $attachment['real_filename'] . "\n\n");
+              if (!$debug) log_info("*");
+
+              // the new link is just pointing to the real filename in the current directory
+              $post_text = substr_replace($post_text, rawurlencode($attachment['real_filename']), $dl_index + 1, $link_len);
+
+              if (!in_array($attachment, $attachments)) {
+			    $attachments[] = $attachment;
+			  }
+          }
+        }
+      } else {
+        if ($debug) log_info("--id not found in link.\n");
+	  }
+
+      $dl_index = strpos($post_text, "\"" . $download_url, $dl_index + 1);
+    }
+  }
+  
+  // now get all attachments which are associated with this post, but not found in text
+  $res = $db->query(
+    'SELECT attach_id, topic_id, physical_filename, real_filename, filetime FROM ' . $db_prefix .
+    "attachments WHERE post_msg_id = '" . $post_id . "';");
+  if ($res !== FALSE) {
+    foreach ($res as $row) {
+      if (!get_attachment_object_by_id($row['attach_id'], $all_topic_attachments)) {
+	    $attachment = get_attachment_object_from_db($row, $all_topic_attachments);
+		log_info("\nNOTE: orphaned attachment for topic " . $row['topic_id'] . " / post $post_id:\n");
+        log_info("--physical: " . $attachment['physical_filename'] . "\n");
+        log_info("--original: " . $attachment['real_filename'] . "\n\n");
+		//TODO: manually add a link in $post_text to that attachment?
+		$attachments[] = $attachment;
+	  }
+	}
+  }
+  
+  return $attachments;
+}
+
+
 // Returns updated $topics.
 function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
   global $forum_url;
@@ -79,15 +229,36 @@ function get_posts($phpbb_version, $db, $db_prefix, $extracted) {
     "config WHERE config_name = 'smilies_path';");
   $smilies_path = $res->fetch()['config_value'];
 
+  // gather possible download paths used in the forum (also when cross linking)
+  $download_urls = array();
+  $download_urls[] = "./download/file.php?";
+  $this_dl_url = $forum_url. "/download/file.php?";
+  $download_urls[] = $this_dl_url;
+  $index = strpos($this_dl_url, "https://");
+  if ($index !== FALSE) {
+    // also test for http version
+    $this_dl_url = str_replace("https://", "http://", $this_dl_url);
+    $download_urls[] = $this_dl_url;
+  }
+  // remove protocol
+  $this_dl_url = str_replace("http://", "", $this_dl_url);
+  // next slash is the absolute URL path
+  $index = strpos($this_dl_url, "/");
+  if ($index !== FALSE) {
+    $download_urls[] = substr($this_dl_url, $index);
+  }
+  //log_info("\nAttachment paths: " . implode(",", $download_urls) . "\n");
+
   // This variable will be returned later.
   $topics = $extracted['topics'];
 
   // Cache of posts
-  $dba_id = dba_open('posts.cache.dbm', 'c');
+  $dba_id = dba_open('forum-data_download_cache.dbm', 'c');
 
   // For each previously identified topic, fetch the corresponding posts.
-  log_info("Topics:");
+  log_info("Extracting topics...");
   foreach ($topics as $tid => $topic) {
+    log_info(" $tid");
     if ($phpbb_version == PHPBB2) {
       $res = $db->query('SELECT p.post_id, p.poster_id, p.post_username, u.username, p.post_time, pt.post_subject, pt.post_text, pt.bbcode_uid FROM '.$db_prefix.'posts p LEFT JOIN '.$db_prefix.'users u ON p.poster_id=u.user_id LEFT JOIN '.$db_prefix.'posts_text pt ON p.post_id=pt.post_id WHERE p.topic_id=' . $tid . ' ORDER BY p.post_time ASC');
     }
@@ -114,6 +285,8 @@ SQL
     }
 
     $topics[$tid]['posts'] = array();
+    $all_topic_attachments = array();
+
     foreach ($res as $row) {
       $post_id = $row['post_id'];
       $got_text = false;
@@ -139,6 +312,15 @@ SQL
             // What if it wasn't found?
             $textNode = $textNodes[0];
             $text = $doc->saveHTML($textNode);
+			// attachments?
+            $attachmentNodes = $xpath->query("//div[@id='{$id}']//dl[@class='attachbox']");
+			if (!empty($attachmentNodes)) {
+              foreach ($attachmentNodes as $attachmentNode) {
+			    $text .= "\n" . $doc->saveHTML($attachmentNode);
+				log_info("+");
+			  }
+			}
+			
             $dbm_key = substr($id, 1);
             dba_insert($dbm_key, $text, $dba_id);
           }
@@ -163,10 +345,13 @@ SQL
 
       // Fix the smilies paths. In an phpBB installation, links to smilies start
       // from the top level. In the case of the archive, topics are 3 levels down,
-      // when you cound slashes. So if images are in the same place as previously,
+      // when you count slashes. So if images are in the same place as previously,
       // we need to go 3 levels up to find them.
       $post_text = str_replace('src="./' . $smilies_path,
                                'src="../../../' . $smilies_path, $post_text);
+
+      //extract attachments for this post
+      $attachments = fix_attachments($tid, $row['post_id'], /*IN OUT*/$post_text, $db, $db_prefix, $download_urls, $all_topic_attachments);
 
       $topics[$tid]['posts'][] = array(
         'username'   => $row['username'],
@@ -174,11 +359,11 @@ SQL
         'post_time'  => $row['post_time'],
         'bbcode_uid'  => $row['bbcode_uid'],
         'post_id'  => $row['post_id'],
+        'attachments'  => $attachments,
       );
     }
-    log_info(" $tid");
   }  // each $topics
-  log_info(" done.\n");
+  log_info("\n");
   dba_close($dba_id);
   return $topics;
 }
@@ -272,13 +457,14 @@ function get_forums_and_topics($phpbb_version, $db, $db_prefix, $extracted) {
   }
 
   // Get topics
-if($phpbb3_minor_version == 0) {
+  if($phpbb3_minor_version == 0) {
     $res = $db->query(<<<SQL
     SELECT
       t.forum_id,
       t.topic_id,
       t.topic_title,
       t.topic_time,
+	  t.topic_type,
       t.topic_replies,
       u.username
     FROM
@@ -287,18 +473,20 @@ if($phpbb3_minor_version == 0) {
     WHERE
       t.topic_moved_id = 0
     ORDER BY
+	  t.topic_type DESC,
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
 SQL
     );
-} elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
+  } elseif ($phpbb3_minor_version == 1 || $phpbb3_minor_version == 2) {
     $res = $db->query(<<<SQL
     SELECT
       t.forum_id,
       t.topic_id,
       t.topic_title,
       t.topic_time,
+	  t.topic_type,
       t.topic_posts_approved,
       u.username
     FROM
@@ -307,26 +495,29 @@ SQL
     WHERE
       t.topic_moved_id = 0
     ORDER BY
+	  t.topic_type DESC,
       t.topic_time DESC
     -- LIMIT 100 -- uncomment in development for faster runs
     ;
 SQL
     );
-} else {
+  } else {
     die('Unknown PHPBB minor version');
-}
+  }
+
   foreach ($res as $row) {
     $fid = $row['forum_id'];
 
     if (in_array($fid, $filter_forum)) {
       continue;
     }
-
+	
     if($phpbb3_minor_version == 0) {
         $topics[$row['topic_id']] = array(
           'fid'     => $fid,
           'title'   => $row['topic_title'],
           'time'    => $row['topic_time'],
+          'type'    => $row['topic_type'],
           'replies' => $row['topic_replies'],
           'author'  => $row['username'],
           'lastmod' => gmdate('Y-m-d\TH:i:s\Z', $row['topic_time']),
@@ -335,6 +526,7 @@ SQL
         $topics[$row['topic_id']] = array(
           'fid'     => $fid,
           'title'   => $row['topic_title'],
+          'type'    => $row['topic_type'],
           'time'    => $row['topic_time'],
           'replies' => $row['topic_posts_approved'],
           'author'  => $row['username'],
@@ -352,25 +544,30 @@ SQL
 function save_data_in_json($what, $where_to) {
   // The encoding flags aren't crucial, they are just here because they make it
   // easier for me to review the resulting JSON.
-  log_info('Encoding to JSON… ');
+  log_info('Encoding to JSON... ');
   $encoded_data = json_encode($what,
     JSON_PRETTY_PRINT | JSON_HEX_APOS | JSON_HEX_QUOT
     | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
   if ($encoded_data !== false) {
-    log_info('saving to disk… ');
+    log_info('saving to disk... ');
     $fp = fopen($where_to, 'w');
     fwrite($fp, $encoded_data);
      // The encoder doesn't add a newline at the end.
     fwrite($fp, "\n");
     fclose($fp);
-    log_info('done.');
+    log_info("done.\n");
   } else {
-    error_log('Could not encode data to JSON.');
+    error_log('Could not encode data to JSON.\n');
   }
 }
 
+$db_port_statement = '';
+if (!empty($db_port)) {
+  $db_port_statement = ";port=$db_port";
+}
+
 $db = new PDO(
-  'mysql:host=' . $db_host . ';dbname=' . $db_name . ';charset=utf8mb4',
+  'mysql:host=' . $db_host . $db_port_statement . ';dbname=' . $db_name . ';charset=utf8mb4',
   $db_user, $db_pass);
 
 
@@ -384,6 +581,7 @@ try {
   $extracted['topics'] = get_posts($phpbb_version, $db, $db_prefix, $extracted);
   unset($forums_and_topics);
   save_data_in_json($extracted, 'forum-data.json');
+  log_info("\n");
 } catch(PDOException $ex) {
   echo "An Error occured! " . $ex->getMessage();
   throw $ex;

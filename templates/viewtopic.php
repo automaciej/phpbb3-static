@@ -7,8 +7,6 @@
 // and which topic numbers correspond to which forums.
 require_once('redirection-data.php');
 
-$archive_base_url = '<please set>/';
-
 $found = false;
 
 if (isset($_GET['p'])) {

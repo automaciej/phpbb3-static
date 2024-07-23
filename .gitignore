@@ -1,1 +1,4 @@
 config.php
+/forum-data.json
+/forum-data_download_cache.dbm
+/redirection-data.php

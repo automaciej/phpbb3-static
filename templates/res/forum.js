@@ -1,13 +1,13 @@
 $.tablesorter.addParser({
-	id: 'datetime',
+	id: 'typedatetime',
 	is: function(s) {
 		return false
 	},
-	format: function(s) {
-		s = s.replace(/(..)-(..)-(....) (..):(..):(..)/, '$2/$1/$3 $4:$5:$6');
-		return $.tablesorter.formatFloat(new Date(s).getTime());
+	format: function(s, table, cell, cellIndex) {
+		topic_type = $(cell).attr('ttype');
+		return "" + topic_type + s;
 	},
-	type: "numertic"
+	type: "text"
 });
 
 function load(f) {
@@ -16,7 +16,7 @@ function load(f) {
 			sortList: [[3,1]],
 			headers: {
 				3: {
-					sorter: 'datetime'
+					sorter: 'typedatetime'
 				}
 			},
 			widgets: ['zebra']
@@ -24,7 +24,7 @@ function load(f) {
 
 		$('#topics').tablesorterPager({
 			container: $('#pager'),
-			size: 10
+			size: 20000
 		});
 	}
 }

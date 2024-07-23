@@ -7,7 +7,15 @@
 1. php7.0-mysql (the converter only works with MySQL databases)
 1. php7.0-dba
 1. PEAR's HTML\_BBCodeParser (https://pear.php.net/package/HTML_BBCodeParser2/)
-1. A running instance of your forum (read-only is fine)
+   
+   These commands worked in 2020:
+
+        $ sudo apt-get install php7.3-cli php7.3-intl php7.3-mysql php7.3-dba
+        $ sudo pear channel-update pear.php.net
+        $ sudo pear install HTML_BBCodeParser2-0.1.0
+		$ sudo chmod -R o+rX /usr/share/php/HTML
+
+1. A running instance of your forum (read-only is fine).
 
 ## Usage
 
@@ -18,58 +26,76 @@
    will be blocked by the forum. If this happens, the script will stop with an
    error.
 
-1. Make sure your forum uses the prosilver skin.
+1. In the forum administration, ensure that every forum sits in a top-level
+   category forum. If there are top level forums, create a category forum "Forums"
+   and set the parent of all top level forums to this category.
 
-1. Copy config.php-example to config.php and edit it. Set your database
-   configuration.
+   The archive script currently only works correctly for forums which are a child
+   of a category forum.
 
-1. Create the static/ directory
+1. Make sure your forum uses the `prosilver` skin.
 
-        $ mkdir static
+1. Clone this repository to an arbitrary location (not to the forum root!) and cd into it.
+
+1. Copy `config.php-example` to `config.php`:
+
+        $ cp config.php-example config.php
+
+   Then, edit `config.php` and set your database configuration.
 
 1. Run the scripts
 
-        $ php extract.php
+        $ nice php extract.php
 
-   You now have the forum-data.json file in the working directory.
+   You now have the `forum-data.json` file in the working directory.
+   
+   The script also creates `forum-data_download_cache.dbm` which is a cache
+   of the downloaded pages. Re-running `extract.php` will not re-download the
+   pages.
+   
+   Note: using `nice` will not overload your CPU when running this on a production system.
 
-        $ php legacy_write_html.php
+1. Extract HTML pages to the `static/` directory and copy scripts and smilies:
 
-1. Copy resources (css, js, etc)
+        $ nice php legacy_write_html.php
 
-        $ cp -r templates/res/* static/
+1. [optional] Redirects from old URLs
 
-1. Point your browser to static/ directory
+   If you would like to preserve the old URLs and redirect to the archive,
+   generate the file with redirection data:
 
-1. Final touches: you might need to copy your forum's smilies directory
-   (images/smilies) into the static directory.
+        $ nice php generate_redirection_data.php
+
+   The script will create `redirection-data.php` in the `static/` directory.
+   It will also copy `viewforum.php` and `viewtopic.php` there.
+   
+   If your old forum URL is different from the archive, you will need to copy these
+   _three_ files into the root of your old forum URL.
+
+1. Point your browser to `static/` directory
 
 1. That's all :)
 
-### Redirects from old URLs
-
-If you would like to preserve the old URLs and redirect to the archive, you can
-generate a file with redirection data:
-
-```
-php generate_redirection_data.php
-```
-
-This command will generate redirection-data.php.
-
-Then customize the included viewforum.php and viewtopic.php files, copy
-redirection-data.php there too, it's necessary for redirections to work.
 
 ## Bugs / known issues
 
+*   Cannot extract top-level forums with topics.
+    Workaround: create a top level category forum and set the parent of all top
+	level forums to that category forum.
 *   Usability issues: if you go from the list of topics to a topic and then go
     back, you'll lose your position in the list of forums, see issue
     [#8](https://github.com/automatthias/phpbb3-static/issues/8).
-*   The code doesn't work with PHP5. It shouldn't be a difficult fix, but… see
-    section below.
-*   I removed the 16-years-old jquery from the templates/res directory.
+*   The code doesn't work with PHP5.
+*   The 16-years-old jquery was removed from the templates/res directory.
 
 ## Maintenance of phpbb3-static
+
+### 2020
+
+We at bome have extended and used these scripts in August 2020 to archive
+forums running PHPBB 3.3.
+
+### 2016
 
 I used phpbb3-static in 2016, when I was making an archive of my old phpBB
 forum. I've finished this work, and I won't work on phpbb3-static any more.

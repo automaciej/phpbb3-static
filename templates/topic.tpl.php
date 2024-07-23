@@ -19,7 +19,7 @@ global $topics_append_html;
 
 <h1><?=$title;?></h1>
 
-<!-- Live forum:
+<!-- Original URL of this topic:
 	<a href="<?=$url;?>"><?=$url;?></a>
 -->
 
@@ -30,7 +30,7 @@ global $topics_append_html;
 		$user = $post['username'];
 		$html = $post['post_text'];
 		$time = $post['post_time'];
-		$dt = date('d-m-Y H:i:s', $time);
+		$dt = date('Y-m-d H:i:s', $time);
 		$bid = $post['bbcode_uid'];
 		$post_id = $post['post_id'];
 ?>
@@ -50,6 +50,9 @@ global $topics_append_html;
 	}
 
 ?>
+<div class="breadcrumb">
+	<p><a href="../../../"><?=$forum_name;?></a> &raquo; <a href="../../"><?=$forum_title;?></a></p>
+</div>
 <footer>
 <?=$topics_append_html?>
 </footer>

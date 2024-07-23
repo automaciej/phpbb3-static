@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/), and
 releases follow the [semantic versioning guidelines](http://semver.org/).
 
+## [] ― 2020-08-17 (bome)
+### Added
+-   archive attachments along in topic directory
+-   sort sticky, announcement, and global topics on top
+-   automatically create static dir and copy smilies and templates
+
+
 ## [Unreleased]
 ### Added
 -   viewtopic.php and viewforum.php shims to preserve old URLs and add redirects
