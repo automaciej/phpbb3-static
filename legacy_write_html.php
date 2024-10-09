@@ -5,9 +5,9 @@ require_once('common.php');
 
 log_info("Writing HTML files:\n");
 
-$forum_url = trim($forum_url, '/');
-$forum_dir = trim($forum_dir, '/');
-$target_dir = trim($target_dir, '/');
+$forum_url = rtrim($forum_url, '/');
+$forum_dir = rtrim($forum_dir, '/');
+$target_dir = rtrim($target_dir, '/');
 
 $forum_dir_valid = TRUE;
 
