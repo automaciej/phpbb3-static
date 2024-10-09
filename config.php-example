@@ -46,7 +46,10 @@ $archive_base_url = 'http://www.example.com/forum-archive/';
 define('PHPBB3', 3);
 define('PHPBB2', 2);
 
+// Set the major version of PHPBB you have (PHPBB2 or PHPBB3)
 $phpbb_version = PHPBB3;
+
+// If you get errors relating to missing tables, try adjusting this value
 $phpbb3_minor_version = 0; // 0, 1 or 2
 
 // constants
